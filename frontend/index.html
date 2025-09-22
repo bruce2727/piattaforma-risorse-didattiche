@@ -189,6 +189,23 @@
   </section>
 
 <script>
+// ---- INIT ----
+$("searchInput").addEventListener("input", renderResources);
+$("categoryFilter").addEventListener("change", renderResources);
+$("gradeFilter").addEventListener("change", renderResources);
+
+// inizializzazione
+async function initApp(){
+  await loadResources();
+  await loadPlaylists();
+  // resetare editIndex / editPlaylistIndex
+  editIndex = null;
+  editPlaylistIndex = null;
+  showSection("resources");
+}
+
+initApp();
+
   const apiBase = "https://piattaforma-risorse-didattiche.onrender.com/api";
 
   const $=id=>document.getElementById(id);
