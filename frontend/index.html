@@ -275,7 +275,6 @@
     $("courseTitle").textContent=p.titolo;
     $("lessonList").innerHTML="";
     p.risorse.forEach((id)=>{const r=resources.find(x=>x.id===id);if(r){const d=document.createElement("div");d.className="lesson";d.textContent=r.titolo;d.onclick=()=>{openResource(resources.indexOf(r),true);d.classList.add("completed");updateProgress(i)};$("lessonList").appendChild(d)}});
-    // 👇 rimosso il blocco che apriva automaticamente la prima risorsa
     updateProgress(i);$("courseView").style.display="flex"
   }
   function updateProgress(i){const done=$("lessonList").querySelectorAll(".lesson.completed").length;$("courseProgress").innerText=`Progresso: ${done}/${playlists[i].risorse.length}`}
@@ -289,7 +288,16 @@
   $("searchInput").addEventListener("input",renderResources);
   $("categoryFilter").addEventListener("change",renderResources);
   $("gradeFilter").addEventListener("change",renderResources);
-  loadResources();loadPlaylists();showSection("resources");
+
+  // reset UI allo startup (per evitare di rimanere in corso/lezione al refresh)
+  $("courseView").style.display = "none";
+  $("viewModal").style.display = "none";
+  $("resourceModal").style.display = "none";
+  $("playlistModal").style.display = "none";
+
+  loadResources();
+  loadPlaylists();
+  showSection("resources");
 </script>
 </body>
 </html>
