@@ -77,6 +77,7 @@
         <option>Storytelling e Multimedia</option>
         <option>Metodologie didattiche</option>
         <option>App per l'inclusione</option>
+		<option>Digitalizzazione amministrativa</option>
       </select>
       <select id="gradeFilter">
         <option value="">Tutti i gradi</option>
@@ -84,6 +85,7 @@
         <option>Primaria</option>
         <option>Secondaria di primo grado</option>
         <option>Tutti i gradi</option>
+		<option>Segreteria</option>
       </select>
     </div>
     <main id="resourceGrid" class="grid"></main>
@@ -127,6 +129,7 @@
         <option>Storytelling e Multimedia</option>
         <option>Metodologie didattiche</option>
         <option>App per l'inclusione</option>
+		<option>Digitalizzazione amministrativa</option>
       </select>
       <label>Grado</label>
       <select id="resGrade">
@@ -134,6 +137,7 @@
         <option>Primaria</option>
         <option>Secondaria di primo grado</option>
         <option>Tutti i gradi</option>
+		<option>Segreteria</option>
       </select>
       <label>Tag</label><input id="resTags" type="text" />
       <label>Tipo</label>
@@ -164,6 +168,7 @@
         <option>Storytelling e Multimedia</option>
         <option>Metodologie didattiche</option>
         <option>App per l'inclusione</option>
+		<option>Digitalizzazione amministrativa</option>
       </select>
       <label>Seleziona risorse</label><div id="resourceCheckboxes"></div>
       <button class="btn" onclick="savePlaylist()">Salva</button>
@@ -334,9 +339,9 @@
     const type = $("resType").value;
     let hint = "";
     if(type === "video"){
-      hint = "Suggerimento: incolla un link da YouTube o ScreenPal.";
+      hint = "Suggerimento: incolla un link da pagina YouTube o ScreenPal.";
     } else if(type === "testo"){
-      hint = "Suggerimento: incolla documenti di testo, piani di lezione o UdA.";
+      hint = "Suggerimento: Scrivi o incolla documenti di testo, piani di lezione o UdA.";
     } else if(type === "link"){
       hint = "Suggerimento: aggiungi il link a una pagina web o a una risorsa esterna.";
     }
