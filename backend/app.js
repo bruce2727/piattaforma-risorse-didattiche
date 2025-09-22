@@ -4,16 +4,22 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
 
-// Configurazione Supabase (usa variabili da .env in produzione)
-const supabaseUrl = process.env.SUPABASE_URL || "https://fjnsmhqsbepyofulaeql.supabase.co";
-const supabaseKey = process.env.SUPABASE_KEY || "TUO_ANON_KEY";
+// Configurazione Supabase (usa .env su Render!)
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// --- API ---
+// ---- API ----
+// Test
+app.get('/api', (req, res) => {
+  res.send('Backend attivo e collegato a Supabase!');
+});
+
+// Risorse
 app.get('/api/risorse', async (req, res) => {
   const { data, error } = await supabase.from('risorse').select('*');
   if (error) return res.status(400).json({ error: error.message });
@@ -49,7 +55,7 @@ app.delete('/api/risorse/:id', async (req, res) => {
   res.json({ success: true });
 });
 
-// --- API Minicorsi ---
+// Minicorsi
 app.get('/api/minicorsi', async (req, res) => {
   const { data, error } = await supabase.from('minicorsi').select('*');
   if (error) return res.status(400).json({ error: error.message });
@@ -85,14 +91,16 @@ app.delete('/api/minicorsi/:id', async (req, res) => {
   res.json({ success: true });
 });
 
-// --- Serve il frontend ---
+// ---- FRONTEND ----
+// Serviamo i file statici
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-// Se la rotta non è API, restituisce index.html
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend', 'index.html'));
+// Fallback per SPA (ogni route non API serve index.html)
+app.get(/^\/(?!api).*/, (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 
 // Avvio server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`✅ Server attivo su porta ${PORT}`));
+app.listen(PORT, () => console.log(`Server avviato su porta ${PORT}`));
+
