@@ -175,19 +175,15 @@
   let isAdmin=false,editIndex=null,editPlaylistIndex=null;
   let resources=[], playlists=[];
 
-  // ---- API ----
+  // ---- API CALLS ----
   async function loadResources(){
-    const res=await fetch(apiBase+"/risorse");
-    resources=await res.json();
-    renderResources();
+    const res=await fetch(apiBase+"/risorse");resources=await res.json();renderResources();
   }
   async function loadPlaylists(){
-    const res=await fetch(apiBase+"/minicorsi");
-    playlists=await res.json();
-    renderPlaylists();
+    const res=await fetch(apiBase+"/minicorsi");playlists=await res.json();renderPlaylists();
   }
 
-  // ---- RENDER ----
+  // ---- UI RENDER ----
   function renderResources(){
     const grid=$("resourceGrid");grid.innerHTML="";
     const q=$("searchInput").value.toLowerCase();const cat=$("categoryFilter").value;const grade=$("gradeFilter").value;
@@ -230,6 +226,16 @@
     if(fromCourse){$("courseContent").innerHTML=html}else{$("viewContent").innerHTML=html;$("viewModal").style.display="flex"}
   }
 
+  // ---- FORMS ----
+  function openResourceModal(edit=false){
+    $("resourceModal").style.display="flex";
+    if(edit){const r=resources[editIndex];$("resTitle").value=r.titolo;$("resDesc").value=r.descrizione;$("resCategory").value=r.categoria;$("resGrade").value=r.grado;$("resTags").value=r.tag;$("resType").value=r.tipo;$("resContent").value=r.contenuto}
+    else{$("resTitle").value="";$("resDesc").value="";$("resCategory").value="Coding";$("resGrade").value="Primaria";$("resTags").value="";$("resType").value="testo";$("resContent").value="";editIndex=null}
+    updateContentHint();
+  }
+  function editResource(i){editIndex=i;openResourceModal(true)}
+
+  // ---- COURSE VIEW ----
   function openCourseView(i){
     const p=playlists[i];
     $("courseTitle").textContent=p.titolo;
@@ -257,7 +263,15 @@
   $("searchInput").addEventListener("input",renderResources);
   $("categoryFilter").addEventListener("change",renderResources);
   $("gradeFilter").addEventListener("change",renderResources);
-  loadResources();loadPlaylists();showSection("resources");
+
+  $("courseView").style.display = "none";
+  $("viewModal").style.display = "none";
+  $("resourceModal").style.display = "none";
+  $("playlistModal").style.display = "none";
+
+  loadResources();
+  loadPlaylists();
+  showSection("resources");
 </script>
 </body>
 </html>
