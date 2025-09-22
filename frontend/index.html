@@ -51,6 +51,7 @@
     .lesson:hover{background:#f0f4ff}
     .lesson.completed{background:#e8f6ec;border-color:#cdebd8}
     .course-content{flex:1;padding:14px;overflow:auto}
+    .hint{font-size:13px;color:var(--muted);margin-top:4px;font-style:italic}
   </style>
 </head>
 <body>
@@ -93,25 +94,6 @@
     <main id="playlistGrid" class="grid"></main>
   </section>
 
-  <div id="adminPanel" class="admin-panel">
-    <button onclick="openResourceModal()">＋</button>
-    <button onclick="openPlaylistModal()">📚</button>
-  </div>
-  <div id="loginBox" class="login-box">
-    <input id="adminPass" type="password" placeholder="Password admin" />
-    <button onclick="adminLogin()">Login</button>
-  </div>
-
-  <!-- Modale Visualizzazione Risorsa -->
-  <div id="viewModal" class="modal">
-    <div id="viewModalContent" class="modal-content">
-      <div class="modal-header">
-        <button class="close-btn" onclick="closeViewModal()">Chiudi</button>
-      </div>
-      <div id="viewContent"></div>
-    </div>
-  </div>
-
   <!-- Modale CRUD Risorsa -->
   <div id="resourceModal" class="modal">
     <div class="modal-content">
@@ -137,36 +119,16 @@
       </select>
       <label>Tag</label><input id="resTags" type="text" />
       <label>Tipo</label>
-      <select id="resType">
+      <select id="resType" onchange="updateHint()">
         <option value="testo">Testo</option>
         <option value="video">Video</option>
         <option value="link">Link</option>
       </select>
-      <label>Contenuto</label><textarea id="resContent"></textarea>
+      <label>Contenuto</label>
+      <textarea id="resContent"></textarea>
+      <div id="contentHint" class="hint">Incolla documenti di testo, piani di lezione o UdA</div>
       <button class="btn" onclick="saveResource()">Salva</button>
       <button class="btn btn-plain" onclick="closeModal('resourceModal')">Annulla</button>
-    </div>
-  </div>
-
-  <!-- Modale CRUD Minicorso -->
-  <div id="playlistModal" class="modal">
-    <div class="modal-content">
-      <h2 id="playlistModalTitle">Aggiungi Minicorso</h2>
-      <label>Titolo</label><input id="playlistTitleInput" type="text" />
-      <label>Descrizione</label><textarea id="playlistDescInput"></textarea>
-      <label>Categoria</label>
-      <select id="playlistCategory">
-        <option>Coding</option>
-        <option>Intelligenza Artificiale</option>
-        <option>Stampa 3D</option>
-        <option>UdA</option>
-        <option>Storytelling e Multimedia</option>
-        <option>Metodologie didattiche</option>
-        <option>App per l'inclusione</option>
-      </select>
-      <label>Seleziona risorse</label><div id="resourceCheckboxes"></div>
-      <button class="btn" onclick="savePlaylist()">Salva</button>
-      <button class="btn btn-plain" onclick="closeModal('playlistModal')">Annulla</button>
     </div>
   </div>
 
@@ -194,110 +156,66 @@
   let isAdmin=false,editIndex=null,editPlaylistIndex=null;
   let resources=[], playlists=[];
 
-  // ---- API CALLS ----
-  async function loadResources(){
-    const res=await fetch(apiBase+"/risorse");resources=await res.json();renderResources();
-  }
-  async function loadPlaylists(){
-    const res=await fetch(apiBase+"/minicorsi");playlists=await res.json();renderPlaylists();
-  }
-
-  async function saveResource(){
-    const r={ titolo:$("resTitle").value, descrizione:$("resDesc").value, categoria:$("resCategory").value,
-              grado:$("resGrade").value, tag:$("resTags").value, tipo:$("resType").value,
-              contenuto:$("resContent").value };
-    let res;
-    if(editIndex!==null){ res=await fetch(apiBase+"/risorse/"+resources[editIndex].id,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(r)});}
-    else{res=await fetch(apiBase+"/risorse",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(r)});}
-    await res.json(); closeModal("resourceModal"); loadResources();
-  }
-  async function deleteResource(i){if(confirm("Eliminare?")){await fetch(apiBase+"/risorse/"+resources[i].id,{method:"DELETE"});loadResources()}}
-
-  async function savePlaylist(){
-    const selected=[...$("resourceCheckboxes").querySelectorAll("input:checked")].map(c=>parseInt(c.value));
-    const p={ titolo:$("playlistTitleInput").value, descrizione:$("playlistDescInput").value,
-              categoria:$("playlistCategory").value, risorse:selected };
-    let res;
-    if(editPlaylistIndex!==null){res=await fetch(apiBase+"/minicorsi/"+playlists[editPlaylistIndex].id,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});}
-    else{res=await fetch(apiBase+"/minicorsi",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});}
-    await res.json(); closeModal("playlistModal"); loadPlaylists();
-  }
-  async function deletePlaylist(i){if(confirm("Eliminare?")){await fetch(apiBase+"/minicorsi/"+playlists[i].id,{method:"DELETE"});loadPlaylists()}}
-
-  // ---- UI RENDER ----
-  function renderResources(){
-    const grid=$("resourceGrid");grid.innerHTML="";
-    const q=$("searchInput").value.toLowerCase();const cat=$("categoryFilter").value;const grade=$("gradeFilter").value;
-    resources.filter(r=>(!cat||r.categoria===cat)&&(!grade||r.grado===grade)&&(r.titolo.toLowerCase().includes(q)||r.descrizione.toLowerCase().includes(q)||(r.tag||"").toLowerCase().includes(q)))
-    .forEach((r,i)=>{const card=document.createElement("div");card.className="card";
-      card.innerHTML=`<h3>${r.titolo}</h3><p>${r.descrizione}</p><small><b>${r.categoria}</b> | ${r.grado}</small>
-      <button class="btn" onclick="openResource(${i},false)">Apri Risorsa</button>
-      ${isAdmin?`<button class="btn btn-plain" onclick="editResource(${i})">Modifica</button><button class="btn btn-danger" onclick="deleteResource(${i})">Elimina</button>`:""}`;
-      grid.appendChild(card);});
-  }
-
-  function renderPlaylists(){
-    const grid=$("playlistGrid");grid.innerHTML="";
-    playlists.forEach((p,i)=>{const card=document.createElement("div");card.className="card";
-      card.innerHTML=`<h3>${p.titolo}</h3><p>${p.descrizione}</p><small>${p.categoria} | ${p.risorse.length} risorse</small>
-      <button class="btn" onclick="openCourseView(${i})">Apri Minicorso</button>
-      ${isAdmin?`<button class="btn btn-plain" onclick="editPlaylist(${i})">Modifica</button><button class="btn btn-danger" onclick="deletePlaylist(${i})">Elimina</button>`:""}`;
-      grid.appendChild(card)});}
-  
   // ---- VIEW ----
   function openResource(i,fromCourse){
-    const r=resources[i];let html=`<h2>${r.titolo}</h2><p>${r.descrizione}</p>`;
-    if(r.tipo==="testo"){html+=`<div>${r.contenuto}</div>`}
-    if(r.tipo==="video"){let url=r.contenuto;if(url.includes("watch?v="))url=url.replace("watch?v=","embed/");if(url.includes("vimeo.com/")&&!url.includes("player.")){url="https://player.vimeo.com/video/"+url.split("/").pop()}html+=`<iframe width="100%" height="450" src="${url}" allowfullscreen></iframe>`}
-    if(r.tipo==="link"){html+=`<a href="${r.contenuto}" target="_blank">Vai alla risorsa</a>`}
-    if(fromCourse){$("courseContent").innerHTML=html}else{$("viewContent").innerHTML=html;$("viewModal").style.display="flex"}
+    const r=resources[i];
+    let html=`<h2>${r.titolo}</h2><p>${r.descrizione}</p>`;
+
+    if(r.tipo==="testo"){
+      html+=`<div>${r.contenuto}</div>`;
+    }
+
+    if(r.tipo==="video"){
+      let url=r.contenuto.trim();
+
+      if(url.includes("youtube.com/watch")){
+        const videoId=new URL(url).searchParams.get("v");
+        url="https://www.youtube.com/embed/"+videoId;
+      } else if(url.includes("youtu.be/")){
+        const videoId=url.split("youtu.be/")[1].split("?")[0];
+        url="https://www.youtube.com/embed/"+videoId;
+      } else if(url.includes("vimeo.com/") && !url.includes("player.")){
+        url="https://player.vimeo.com/video/"+url.split("/").pop();
+      }
+
+      html+=`<iframe width="100%" height="450" src="${url}" allowfullscreen></iframe>`;
+    }
+
+    if(r.tipo==="link"){
+      html+=`<a href="${r.contenuto}" target="_blank">Vai alla risorsa</a>`;
+    }
+
+    if(fromCourse){
+      $("courseContent").innerHTML=html;
+    }else{
+      $("viewContent").innerHTML=html;
+      $("viewModal").style.display="flex";
+    }
   }
 
-  // ---- FORMS ----
-  function openResourceModal(edit=false){
-    $("resourceModal").style.display="flex";
-    if(edit){const r=resources[editIndex];$("resTitle").value=r.titolo;$("resDesc").value=r.descrizione;$("resCategory").value=r.categoria;$("resGrade").value=r.grado;$("resTags").value=r.tag;$("resType").value=r.tipo;$("resContent").value=r.contenuto}
-    else{$("resTitle").value="";$("resDesc").value="";$("resCategory").value="Coding";$("resGrade").value="Primaria";$("resTags").value="";$("resType").value="testo";$("resContent").value="";editIndex=null}
+  // ---- Dynamic hint for content ----
+  function updateHint(){
+    const type=$("resType").value;
+    const hint=$("contentHint");
+    if(type==="video") hint.textContent="Carica da YouTube o da ScreenPal";
+    else if(type==="testo") hint.textContent="Incolla documenti di testo, piani di lezione o UdA";
+    else if(type==="link") hint.textContent="Aggiungi il link a una pagina web/risorsa esterna";
   }
-  function editResource(i){editIndex=i;openResourceModal(true)}
-
-  function openPlaylistModal(edit=false){
-    $("playlistModal").style.display="flex";const c=$("resourceCheckboxes");c.innerHTML="";
-    resources.forEach((r,i)=>{c.innerHTML+=`<label><input type="checkbox" value="${r.id}"> ${r.titolo}</label><br>`;});
-    if(edit){const p=playlists[editPlaylistIndex];$("playlistTitleInput").value=p.titolo;$("playlistDescInput").value=p.descrizione;$("playlistCategory").value=p.categoria;p.risorse.forEach(id=>{$("resourceCheckboxes").querySelector(`input[value="${id}"]`).checked=true})}
-    else{$("playlistTitleInput").value="";$("playlistDescInput").value="";$("playlistCategory").value="Coding";editPlaylistIndex=null;}
-  }
-  function editPlaylist(i){editPlaylistIndex=i;openPlaylistModal(true)}
-
-  // ---- COURSE VIEW ----
-  function openCourseView(i){
-    const p=playlists[i];
-    $("courseTitle").textContent=p.titolo;
-    $("lessonList").innerHTML="";
-    p.risorse.forEach((id)=>{const r=resources.find(x=>x.id===id);if(r){const d=document.createElement("div");d.className="lesson";d.textContent=r.titolo;d.onclick=()=>{openResource(resources.indexOf(r),true);d.classList.add("completed");updateProgress(i)};$("lessonList").appendChild(d)}});
-    updateProgress(i);$("courseView").style.display="flex"
-  }
-  function updateProgress(i){const done=$("lessonList").querySelectorAll(".lesson.completed").length;$("courseProgress").innerText=`Progresso: ${done}/${playlists[i].risorse.length}`}
-  function closeCourseView(){$("courseView").style.display="none"}
-  function closeViewModal(){$("viewModal").style.display="none"}
-  function closeModal(id){$(id).style.display="none"}
-  function showSection(s){$("resourcesSection").style.display=s==="resources"?"block":"none";$("playlistsSection").style.display=s==="playlists"?"block":"none";$("navResources").classList.toggle("active",s==="resources");$("navPlaylists").classList.toggle("active",s==="playlists");if(s==="resources")loadResources();else loadPlaylists();}
-  function adminLogin(){if($("adminPass").value.trim()==="admin123"){isAdmin=true;$("adminPanel").style.display="flex";$("loginBox").style.display="none";loadResources();loadPlaylists();} else alert("Password errata")}
 
   // ---- INIT ----
   $("searchInput").addEventListener("input",renderResources);
   $("categoryFilter").addEventListener("change",renderResources);
   $("gradeFilter").addEventListener("change",renderResources);
 
-  // reset UI allo startup (per evitare di rimanere in corso/lezione al refresh)
-  $("courseView").style.display = "none";
-  $("viewModal").style.display = "none";
-  $("resourceModal").style.display = "none";
-  $("playlistModal").style.display = "none";
+  $("courseView").style.display="none";
+  $("viewModal").style.display="none";
+  $("resourceModal").style.display="none";
+  $("playlistModal").style.display="none";
 
   loadResources();
   loadPlaylists();
   showSection("resources");
+  updateHint(); // inizializza suggerimento
 </script>
 </body>
 </html>
