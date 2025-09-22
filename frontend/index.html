@@ -189,82 +189,60 @@
   </section>
 
 <script>
-// ---- INIT ----
-$("searchInput").addEventListener("input", renderResources);
-$("categoryFilter").addEventListener("change", renderResources);
-$("gradeFilter").addEventListener("change", renderResources);
-
-// inizializzazione
-async function initApp(){
-  await loadResources();
-  await loadPlaylists();
-  // resetare editIndex / editPlaylistIndex
-  editIndex = null;
-  editPlaylistIndex = null;
-  showSection("resources");
-}
-
-initApp();
-
   const apiBase = "https://piattaforma-risorse-didattiche.onrender.com/api";
+  const $ = id => document.getElementById(id);
 
-  const $=id=>document.getElementById(id);
-  let isAdmin=false,editIndex=null,editPlaylistIndex=null;
+  let isAdmin=false, editIndex=null, editPlaylistIndex=null;
   let resources=[], playlists=[];
 
   // ---- API CALLS ----
-  async function loadResources(){
-    const res=await fetch(apiBase+"/risorse");resources=await res.json();renderResources();
-  }
-  async function loadPlaylists(){
-    const res=await fetch(apiBase+"/minicorsi");playlists=await res.json();renderPlaylists();
-  }
+  async function loadResources(){ const res=await fetch(apiBase+"/risorse"); resources=await res.json(); renderResources(); }
+  async function loadPlaylists(){ const res=await fetch(apiBase+"/minicorsi"); playlists=await res.json(); renderPlaylists(); }
 
   async function saveResource(){
     const r={ titolo:$("resTitle").value, descrizione:$("resDesc").value, categoria:$("resCategory").value,
-              grado:$("resGrade").value, tag:$("resTags").value, tipo:$("resType").value,
-              contenuto:$("resContent").value };
+              grado:$("resGrade").value, tag:$("resTags").value, tipo:$("resType").value, contenuto:$("resContent").value };
     let res;
-    if(editIndex!==null){ res=await fetch(apiBase+"/risorse/"+resources[editIndex].id,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(r)});}
-    else{res=await fetch(apiBase+"/risorse",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(r)});}
+    if(editIndex!==null){ res=await fetch(apiBase+"/risorse/"+resources[editIndex].id,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(r)}); }
+    else{ res=await fetch(apiBase+"/risorse",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(r)}); }
     await res.json(); closeModal("resourceModal"); loadResources();
   }
-  async function deleteResource(i){if(confirm("Eliminare?")){await fetch(apiBase+"/risorse/"+resources[i].id,{method:"DELETE"});loadResources()}}
+  async function deleteResource(i){ if(confirm("Eliminare?")){ await fetch(apiBase+"/risorse/"+resources[i].id,{method:"DELETE"}); loadResources(); } }
 
   async function savePlaylist(){
     const selected=[...$("resourceCheckboxes").querySelectorAll("input:checked")].map(c=>parseInt(c.value));
-    const p={ titolo:$("playlistTitleInput").value, descrizione:$("playlistDescInput").value,
-              categoria:$("playlistCategory").value, risorse:selected };
+    const p={ titolo:$("playlistTitleInput").value, descrizione:$("playlistDescInput").value, categoria:$("playlistCategory").value, risorse:selected };
     let res;
-    if(editPlaylistIndex!==null){res=await fetch(apiBase+"/minicorsi/"+playlists[editPlaylistIndex].id,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});}
-    else{res=await fetch(apiBase+"/minicorsi",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});}
+    if(editPlaylistIndex!==null){ res=await fetch(apiBase+"/minicorsi/"+playlists[editPlaylistIndex].id,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)}); }
+    else{ res=await fetch(apiBase+"/minicorsi",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)}); }
     await res.json(); closeModal("playlistModal"); loadPlaylists();
   }
-  async function deletePlaylist(i){if(confirm("Eliminare?")){await fetch(apiBase+"/minicorsi/"+playlists[i].id,{method:"DELETE"});loadPlaylists()}}
+  async function deletePlaylist(i){ if(confirm("Eliminare?")){ await fetch(apiBase+"/minicorsi/"+playlists[i].id,{method:"DELETE"}); loadPlaylists(); } }
 
   // ---- UI RENDER ----
   function renderResources(){
-    const grid=$("resourceGrid");grid.innerHTML="";
-    const q=$("searchInput").value.toLowerCase();const cat=$("categoryFilter").value;const grade=$("gradeFilter").value;
+    const grid=$("resourceGrid"); grid.innerHTML="";
+    const q=$("searchInput").value.toLowerCase(), cat=$("categoryFilter").value, grade=$("gradeFilter").value;
     resources.filter(r=>(!cat||r.categoria===cat)&&(!grade||r.grado===grade)&&(r.titolo.toLowerCase().includes(q)||r.descrizione.toLowerCase().includes(q)||(r.tag||"").toLowerCase().includes(q)))
-    .forEach((r,i)=>{const card=document.createElement("div");card.className="card";
+    .forEach((r,i)=>{ const card=document.createElement("div"); card.className="card";
       card.innerHTML=`<h3>${r.titolo}</h3><p>${r.descrizione}</p><small><b>${r.categoria}</b> | ${r.grado}</small>
       <button class="btn" onclick="openResource(${i},false)">Apri Risorsa</button>
       ${isAdmin?`<button class="btn btn-plain" onclick="editResource(${i})">Modifica</button><button class="btn btn-danger" onclick="deleteResource(${i})">Elimina</button>`:""}`;
-      grid.appendChild(card);});
+      grid.appendChild(card); });
   }
 
   function renderPlaylists(){
-    const grid=$("playlistGrid");grid.innerHTML="";
-    playlists.forEach((p,i)=>{const card=document.createElement("div");card.className="card";
+    const grid=$("playlistGrid"); grid.innerHTML="";
+    playlists.forEach((p,i)=>{ const card=document.createElement("div"); card.className="card";
       card.innerHTML=`<h3>${p.titolo}</h3><p>${p.descrizione}</p><small>${p.categoria} | ${p.risorse.length} risorse</small>
       <button class="btn" onclick="openCourseView(${i})">Apri Minicorso</button>
       ${isAdmin?`<button class="btn btn-plain" onclick="editPlaylist(${i})">Modifica</button><button class="btn btn-danger" onclick="deletePlaylist(${i})">Elimina</button>`:""}`;
-      grid.appendChild(card)});}
+      grid.appendChild(card); });
+  }
 
   // ---- VIEW ----
   function openResource(i,fromCourse){
-    const r=resources[i];let html=`<h2>${r.titolo}</h2><p>${r.descrizione}</p>`;
+    const r=resources[i]; let html=`<h2>${r.titolo}</h2><p>${r.descrizione}</p>`;
     if(r.tipo==="testo"){html+=`<div>${r.contenuto}</div>`}
     if(r.tipo==="video"){let url=r.contenuto;if(url.includes("watch?v="))url=url.replace("watch?v=","embed/");if(url.includes("vimeo.com/")&&!url.includes("player.")){url="https://player.vimeo.com/video/"+url.split("/").pop()}html+=`<iframe width="100%" height="450" src="${url}" allowfullscreen></iframe>`}
     if(r.tipo==="link"){html+=`<a href="${r.contenuto}" target="_blank">Vai alla risorsa</a>`}
@@ -281,7 +259,7 @@ initApp();
 
   function openPlaylistModal(edit=false){
     $("playlistModal").style.display="flex";const c=$("resourceCheckboxes");c.innerHTML="";
-    resources.forEach((r,i)=>{c.innerHTML+=`<label><input type="checkbox" value="${r.id}"> ${r.titolo}</label><br>`;});
+    resources.forEach((r)=>{c.innerHTML+=`<label><input type="checkbox" value="${r.id}"> ${r.titolo}</label><br>`;});
     if(edit){const p=playlists[editPlaylistIndex];$("playlistTitleInput").value=p.titolo;$("playlistDescInput").value=p.descrizione;$("playlistCategory").value=p.categoria;p.risorse.forEach(id=>{$("resourceCheckboxes").querySelector(`input[value="${id}"]`).checked=true})}
     else{$("playlistTitleInput").value="";$("playlistDescInput").value="";$("playlistCategory").value="Coding";editPlaylistIndex=null;}
   }
@@ -290,11 +268,11 @@ initApp();
   // ---- COURSE VIEW ----
   function openCourseView(i){
     const p=playlists[i];$("courseTitle").textContent=p.titolo;$("lessonList").innerHTML="";
-    p.risorse.forEach((id)=>{const r=resources.find(x=>x.id===id);if(r){const d=document.createElement("div");d.className="lesson";d.textContent=r.titolo;d.onclick=()=>{openResource(resources.indexOf(r),true);d.classList.add("completed");updateProgress(i)};$("lessonList").appendChild(d)}});
+    p.risorse.forEach((id)=>{const r=resources.find(x=>x.id===id);if(r){const d=document.createElement("div");d.className="lesson";d.textContent=r.titolo;d.onclick=()=>{openResource(resources.indexOf(r),true);d.classList.add("completed");updateProgress(i)};$("lessonList").appendChild(d)}}); 
     if(p.risorse.length){const first=resources.find(x=>x.id===p.risorse[0]);if(first)openResource(resources.indexOf(first),true);}
     updateProgress(i);$("courseView").style.display="flex"
   }
-  function updateProgress(i){const done=$("lessonList").querySelectorAll(".lesson.completed").length;$("courseProgress").innerText=`Progresso: ${done}/${playlists[i].risorse.length}`}
+  function updateProgress(i){const done=$("lessonList").querySelectorAll(".lesson.completed").length;$("courseProgress").innerText=`Progresso: ${done}/${playlists[i].risorse.length}`;}
   function closeCourseView(){$("courseView").style.display="none"}
   function closeViewModal(){$("viewModal").style.display="none"}
   function closeModal(id){$(id).style.display="none"}
@@ -302,10 +280,13 @@ initApp();
   function adminLogin(){if($("adminPass").value.trim()==="admin123"){isAdmin=true;$("adminPanel").style.display="flex";$("loginBox").style.display="none";loadResources();loadPlaylists();} else alert("Password errata")}
 
   // ---- INIT ----
-  $("searchInput").addEventListener("input",renderResources);
-  $("categoryFilter").addEventListener("change",renderResources);
-  $("gradeFilter").addEventListener("change",renderResources);
-  loadResources();loadPlaylists();showSection("resources");
+  function initApp(){
+    $("searchInput").addEventListener("input",renderResources);
+    $("categoryFilter").addEventListener("change",renderResources);
+    $("gradeFilter").addEventListener("change",renderResources);
+    loadResources(); loadPlaylists(); showSection("resources");
+  }
+  document.addEventListener("DOMContentLoaded", initApp);
 </script>
 </body>
 </html>
