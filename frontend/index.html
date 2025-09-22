@@ -216,11 +216,19 @@
 
   async function savePlaylist(){
     const selected=[...$("resourceCheckboxes").querySelectorAll("input:checked")].map(c=>parseInt(c.value));
-    const p={ titolo:$("playlistTitleInput").value, descrizione:$("playlistDescInput").value,
-              categoria:$("playlistCategory").value, risorse:selected };
+    const p={ 
+      titolo:$("playlistTitleInput").value, 
+      descrizione:$("playlistDescInput").value,
+      categoria:$("playlistCategory").value, 
+      risorse: JSON.stringify(selected) // forza JSON
+    };
     let res;
-    if(editPlaylistIndex!==null){res=await fetch(apiBase+"/minicorsi/"+playlists[editPlaylistIndex].id,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});}
-    else{res=await fetch(apiBase+"/minicorsi",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});}
+    if(editPlaylistIndex!==null){
+      res=await fetch(apiBase+"/minicorsi/"+playlists[editPlaylistIndex].id,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});
+    }
+    else{
+      res=await fetch(apiBase+"/minicorsi",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});
+    }
     await res.json(); closeModal("playlistModal"); loadPlaylists();
   }
   async function deletePlaylist(i){if(confirm("Eliminare?")){await fetch(apiBase+"/minicorsi/"+playlists[i].id,{method:"DELETE"});loadPlaylists()}}
@@ -239,11 +247,14 @@
 
   function renderPlaylists(){
     const grid=$("playlistGrid");grid.innerHTML="";
-    playlists.forEach((p,i)=>{const card=document.createElement("div");card.className="card";
-      card.innerHTML=`<h3>${p.titolo}</h3><p>${p.descrizione}</p><small>${p.categoria} | ${p.risorse.length} risorse</small>
+    playlists.forEach((p,i)=>{
+      const risorse = Array.isArray(p.risorse) ? p.risorse : JSON.parse(p.risorse || "[]");
+      const card=document.createElement("div");card.className="card";
+      card.innerHTML=`<h3>${p.titolo}</h3><p>${p.descrizione}</p><small>${p.categoria} | ${risorse.length} risorse</small>
       <button class="btn" onclick="openCourseView(${i})">Apri Minicorso</button>
       ${isAdmin?`<button class="btn btn-plain" onclick="editPlaylist(${i})">Modifica</button><button class="btn btn-danger" onclick="deletePlaylist(${i})">Elimina</button>`:""}`;
-      grid.appendChild(card)});}
+      grid.appendChild(card)});
+  }
   
   // ---- VIEW ----
   function openResource(i,fromCourse){
@@ -280,13 +291,19 @@
 
     updateContentHint();
   }
-
   function editResource(i){editIndex=i;openResourceModal(true)}
 
   function openPlaylistModal(edit=false){
     $("playlistModal").style.display="flex";const c=$("resourceCheckboxes");c.innerHTML="";
     resources.forEach((r,i)=>{c.innerHTML+=`<label><input type="checkbox" value="${r.id}"> ${r.titolo}</label><br>`;});
-    if(edit){const p=playlists[editPlaylistIndex];$("playlistTitleInput").value=p.titolo;$("playlistDescInput").value=p.descrizione;$("playlistCategory").value=p.categoria;p.risorse.forEach(id=>{$("resourceCheckboxes").querySelector(`input[value="${id}"]`).checked=true})}
+    if(edit){
+      const p=playlists[editPlaylistIndex];
+      const risorse = Array.isArray(p.risorse) ? p.risorse : JSON.parse(p.risorse || "[]");
+      $("playlistTitleInput").value=p.titolo;
+      $("playlistDescInput").value=p.descrizione;
+      $("playlistCategory").value=p.categoria;
+      risorse.forEach(id=>{$("resourceCheckboxes").querySelector(`input[value="${id}"]`).checked=true});
+    }
     else{$("playlistTitleInput").value="";$("playlistDescInput").value="";$("playlistCategory").value="Coding";editPlaylistIndex=null;}
   }
   function editPlaylist(i){editPlaylistIndex=i;openPlaylistModal(true)}
@@ -294,12 +311,18 @@
   // ---- COURSE VIEW ----
   function openCourseView(i){
     const p=playlists[i];
+    const risorse = Array.isArray(p.risorse) ? p.risorse : JSON.parse(p.risorse || "[]");
     $("courseTitle").textContent=p.titolo;
     $("lessonList").innerHTML="";
-    p.risorse.forEach((id)=>{const r=resources.find(x=>x.id===id);if(r){const d=document.createElement("div");d.className="lesson";d.textContent=r.titolo;d.onclick=()=>{openResource(resources.indexOf(r),true);d.classList.add("completed");updateProgress(i)};$("lessonList").appendChild(d)}});
+    risorse.forEach((id)=>{const r=resources.find(x=>x.id===id);if(r){const d=document.createElement("div");d.className="lesson";d.textContent=r.titolo;d.onclick=()=>{openResource(resources.indexOf(r),true);d.classList.add("completed");updateProgress(i)};$("lessonList").appendChild(d)}});
     updateProgress(i);$("courseView").style.display="flex"
   }
-  function updateProgress(i){const done=$("lessonList").querySelectorAll(".lesson.completed").length;$("courseProgress").innerText=`Progresso: ${done}/${playlists[i].risorse.length}`}
+  function updateProgress(i){
+    const p=playlists[i];
+    const risorse = Array.isArray(p.risorse) ? p.risorse : JSON.parse(p.risorse || "[]");
+    const done=$("lessonList").querySelectorAll(".lesson.completed").length;
+    $("courseProgress").innerText=`Progresso: ${done}/${risorse.length}`;
+  }
   function closeCourseView(){$("courseView").style.display="none"}
   function closeViewModal(){$("viewModal").style.display="none"}
   function closeModal(id){$(id).style.display="none"}
