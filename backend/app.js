@@ -63,25 +63,39 @@ app.get('/api/minicorsi', async (req, res) => {
 });
 
 app.post('/api/minicorsi', async (req, res) => {
-  const { titolo, descrizione, categoria, risorse } = req.body;
-  const { data, error } = await supabase
-    .from('minicorsi')
-    .insert([{ titolo, descrizione, categoria, risorse }])
-    .select();
-  if (error) return res.status(400).json({ error: error.message });
-  res.status(201).json(data);
+  try {
+    const { titolo, descrizione, categoria, risorse } = req.body;
+    const risorseParsed = typeof risorse === "string" ? JSON.parse(risorse) : risorse;
+
+    const { data, error } = await supabase
+      .from('minicorsi')
+      .insert([{ titolo, descrizione, categoria, risorse: risorseParsed }])
+      .select();
+
+    if (error) return res.status(400).json({ error: error.message });
+    res.status(201).json(data);
+  } catch (err) {
+    res.status(400).json({ error: "Errore parsing risorse: " + err.message });
+  }
 });
 
 app.put('/api/minicorsi/:id', async (req, res) => {
-  const { id } = req.params;
-  const { titolo, descrizione, categoria, risorse } = req.body;
-  const { data, error } = await supabase
-    .from('minicorsi')
-    .update({ titolo, descrizione, categoria, risorse })
-    .eq('id', id)
-    .select();
-  if (error) return res.status(400).json({ error: error.message });
-  res.json(data);
+  try {
+    const { id } = req.params;
+    const { titolo, descrizione, categoria, risorse } = req.body;
+    const risorseParsed = typeof risorse === "string" ? JSON.parse(risorse) : risorse;
+
+    const { data, error } = await supabase
+      .from('minicorsi')
+      .update({ titolo, descrizione, categoria, risorse: risorseParsed })
+      .eq('id', id)
+      .select();
+
+    if (error) return res.status(400).json({ error: error.message });
+    res.json(data);
+  } catch (err) {
+    res.status(400).json({ error: "Errore parsing risorse: " + err.message });
+  }
 });
 
 app.delete('/api/minicorsi/:id', async (req, res) => {
