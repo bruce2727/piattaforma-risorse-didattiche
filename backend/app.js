@@ -72,10 +72,10 @@ app.get('/api/minicorsi', async (req, res) => {
 
 // Aggiungi un minicorso
 app.post('/api/minicorsi', async (req, res) => {
-  const { titolo, descrizione, categoria, risorse } = req.body;
+  const { titolo, descrizione, categoria, risorse, tag } = req.body;
   const { data, error } = await supabase
     .from('minicorsi')
-    .insert([{ titolo, descrizione, categoria, risorse }])
+    .insert([{ titolo, descrizione, categoria, risorse, tag }])
     .select();
   if (error) return res.status(400).json({ error: error.message });
   res.status(201).json(data[0]);
@@ -84,10 +84,10 @@ app.post('/api/minicorsi', async (req, res) => {
 // Modifica un minicorso
 app.put('/api/minicorsi/:id', async (req, res) => {
   const { id } = req.params;
-  const { titolo, descrizione, categoria, risorse } = req.body;
+  const { titolo, descrizione, categoria, risorse, tag } = req.body;
   const { data, error } = await supabase
     .from('minicorsi')
-    .update({ titolo, descrizione, categoria, risorse })
+    .update({ titolo, descrizione, categoria, risorse, tag })
     .eq('id', id)
     .select();
   if (error) return res.status(400).json({ error: error.message });
