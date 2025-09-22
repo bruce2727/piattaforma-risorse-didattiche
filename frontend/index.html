@@ -28,9 +28,11 @@
     .card .btn + .btn{margin-top:6px}
     .btn-danger{background:var(--danger)!important}
     .btn-plain{background:#fff;border:1px solid var(--primary);color:var(--primary)}
-    .admin-panel{position:fixed;bottom:20px;right:20px;display:none;gap:10px;z-index:1100}
-    .admin-panel button{background:var(--success);color:#fff;border:none;padding:12px 16px;border-radius:50%;font-size:20px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15)}
-    .admin-panel button:nth-child(2){background:var(--primary)}
+    .admin-panel{position:fixed;bottom:20px;right:20px;display:none;z-index:1100}
+    .admin-panel .menu-btn{background:var(--success);color:#fff;border:none;padding:12px 16px;border-radius:50%;font-size:20px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+    .admin-menu{display:none;position:absolute;bottom:60px;right:0;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.2);padding:6px;flex-direction:column;gap:6px}
+    .admin-menu button{background:#fff;border:1px solid var(--primary);color:var(--primary);padding:8px;border-radius:6px;cursor:pointer;text-align:left;width:160px}
+    .admin-menu button:hover{background:#f0f4ff}
     .login-box{position:fixed;bottom:20px;left:20px;background:#fff;padding:10px;border:1px solid var(--border);border-radius:8px;display:flex;gap:8px;z-index:1100}
     .login-box input{padding:8px;border:1px solid #ccc;border-radius:6px}
     .login-box button{padding:8px 12px;border:none;border-radius:6px;background:var(--primary);color:#fff;cursor:pointer}
@@ -77,7 +79,7 @@
         <option>Storytelling e Multimedia</option>
         <option>Metodologie didattiche</option>
         <option>App per l'inclusione</option>
-		<option>Digitalizzazione amministrativa</option>
+		    <option>Digitalizzazione amministrativa</option>
       </select>
       <select id="gradeFilter">
         <option value="">Tutti i gradi</option>
@@ -85,7 +87,7 @@
         <option>Primaria</option>
         <option>Secondaria di primo grado</option>
         <option>Tutti i gradi</option>
-		<option>Segreteria</option>
+		    <option>Segreteria</option>
       </select>
     </div>
     <main id="resourceGrid" class="grid"></main>
@@ -95,10 +97,15 @@
     <main id="playlistGrid" class="grid"></main>
   </section>
 
+  <!-- Admin Panel -->
   <div id="adminPanel" class="admin-panel">
-    <button onclick="openResourceModal()">＋</button>
-    <button onclick="openPlaylistModal()">📚</button>
+    <button class="menu-btn" onclick="toggleAdminMenu()">＋</button>
+    <div id="adminMenu" class="admin-menu">
+      <button onclick="openResourceModal()">➕ Nuova Risorsa</button>
+      <button onclick="openPlaylistModal()">➕ Nuovo Minicorso</button>
+    </div>
   </div>
+
   <div id="loginBox" class="login-box">
     <input id="adminPass" type="password" placeholder="Password admin" />
     <button onclick="adminLogin()">Login</button>
@@ -129,7 +136,7 @@
         <option>Storytelling e Multimedia</option>
         <option>Metodologie didattiche</option>
         <option>App per l'inclusione</option>
-		<option>Digitalizzazione amministrativa</option>
+		    <option>Digitalizzazione amministrativa</option>
       </select>
       <label>Grado</label>
       <select id="resGrade">
@@ -137,7 +144,7 @@
         <option>Primaria</option>
         <option>Secondaria di primo grado</option>
         <option>Tutti i gradi</option>
-		<option>Segreteria</option>
+		    <option>Segreteria</option>
       </select>
       <label>Tag</label><input id="resTags" type="text" />
       <label>Tipo</label>
@@ -160,7 +167,7 @@
       <label>Titolo</label><input id="playlistTitleInput" type="text" />
       <label>Descrizione</label><textarea id="playlistDescInput"></textarea>
       <label>Categoria</label>
-      <select id="playlistCategory">
+      <select id="playlistCategory" onchange="filterResourcesByCategory()">
         <option>Coding</option>
         <option>Intelligenza Artificiale</option>
         <option>Stampa 3D</option>
@@ -168,7 +175,7 @@
         <option>Storytelling e Multimedia</option>
         <option>Metodologie didattiche</option>
         <option>App per l'inclusione</option>
-		<option>Digitalizzazione amministrativa</option>
+		    <option>Digitalizzazione amministrativa</option>
       </select>
       <label>Seleziona risorse</label><div id="resourceCheckboxes"></div>
       <button class="btn" onclick="savePlaylist()">Salva</button>
@@ -225,7 +232,7 @@
       titolo:$("playlistTitleInput").value, 
       descrizione:$("playlistDescInput").value,
       categoria:$("playlistCategory").value, 
-      risorse: JSON.stringify(selected) // forza JSON
+      risorse: JSON.stringify(selected)
     };
     let res;
     if(editPlaylistIndex!==null){
@@ -273,7 +280,6 @@
   // ---- FORMS ----
   function openResourceModal(edit=false){
     $("resourceModal").style.display="flex";
-
     if(edit){
       const r=resources[editIndex];
       $("resTitle").value=r.titolo;
@@ -293,23 +299,23 @@
       $("resContent").value="";
       editIndex=null;
     }
-
     updateContentHint();
   }
   function editResource(i){editIndex=i;openResourceModal(true)}
 
   function openPlaylistModal(edit=false){
-    $("playlistModal").style.display="flex";const c=$("resourceCheckboxes");c.innerHTML="";
-    resources.forEach((r,i)=>{c.innerHTML+=`<label><input type="checkbox" value="${r.id}"> ${r.titolo}</label><br>`;});
+    $("playlistModal").style.display="flex";
+    populateResourceCheckboxes();
     if(edit){
       const p=playlists[editPlaylistIndex];
       const risorse = Array.isArray(p.risorse) ? p.risorse : JSON.parse(p.risorse || "[]");
       $("playlistTitleInput").value=p.titolo;
       $("playlistDescInput").value=p.descrizione;
       $("playlistCategory").value=p.categoria;
+      filterResourcesByCategory();
       risorse.forEach(id=>{$("resourceCheckboxes").querySelector(`input[value="${id}"]`).checked=true});
     }
-    else{$("playlistTitleInput").value="";$("playlistDescInput").value="";$("playlistCategory").value="Coding";editPlaylistIndex=null;}
+    else{$("playlistTitleInput").value="";$("playlistDescInput").value="";$("playlistCategory").value="Coding";editPlaylistIndex=null;filterResourcesByCategory();}
   }
   function editPlaylist(i){editPlaylistIndex=i;openPlaylistModal(true)}
 
@@ -332,7 +338,7 @@
   function closeViewModal(){$("viewModal").style.display="none"}
   function closeModal(id){$(id).style.display="none"}
   function showSection(s){$("resourcesSection").style.display=s==="resources"?"block":"none";$("playlistsSection").style.display=s==="playlists"?"block":"none";$("navResources").classList.toggle("active",s==="resources");$("navPlaylists").classList.toggle("active",s==="playlists");if(s==="resources")loadResources();else loadPlaylists();}
-  function adminLogin(){if($("adminPass").value.trim()==="admin123"){isAdmin=true;$("adminPanel").style.display="flex";$("loginBox").style.display="none";loadResources();loadPlaylists();} else alert("Password errata")}
+  function adminLogin(){if($("adminPass").value.trim()==="admin123"){isAdmin=true;$("adminPanel").style.display="block";$("loginBox").style.display="none";loadResources();loadPlaylists();} else alert("Password errata")}
 
   // ---- HINTS ----
   function updateContentHint(){
@@ -346,6 +352,23 @@
       hint = "Suggerimento: aggiungi il link a una pagina web o a una risorsa esterna.";
     }
     $("contentHint").textContent = hint;
+  }
+
+  // ---- RESOURCE FILTER IN PLAYLIST ----
+  function populateResourceCheckboxes(){
+    const c=$("resourceCheckboxes");c.innerHTML="";
+    resources.forEach((r)=>{c.innerHTML+=`<label><input type="checkbox" value="${r.id}"> ${r.titolo} (${r.categoria})</label><br>`;});
+  }
+  function filterResourcesByCategory(){
+    const selectedCat=$("playlistCategory").value;
+    const c=$("resourceCheckboxes");c.innerHTML="";
+    resources.filter(r=>r.categoria===selectedCat).forEach((r)=>{c.innerHTML+=`<label><input type="checkbox" value="${r.id}"> ${r.titolo}</label><br>`;});
+  }
+
+  // ---- ADMIN MENU ----
+  function toggleAdminMenu(){
+    const menu=$("adminMenu");
+    menu.style.display = (menu.style.display==="flex") ? "none" : "flex";
   }
 
   // ---- INIT ----
