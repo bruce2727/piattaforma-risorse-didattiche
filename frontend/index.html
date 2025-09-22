@@ -51,6 +51,7 @@
     .lesson:hover{background:#f0f4ff}
     .lesson.completed{background:#e8f6ec;border-color:#cdebd8}
     .course-content{flex:1;padding:14px;overflow:auto}
+    .hint{font-size:13px;color:#666;margin-top:4px;font-style:italic}
   </style>
 </head>
 <body>
@@ -127,13 +128,14 @@
       </select>
       <label>Tag</label><input id="resTags" type="text" />
       <label>Tipo</label>
-      <select id="resType">
+      <select id="resType" onchange="updateContentHint()">
         <option value="testo">Testo</option>
         <option value="video">Video</option>
         <option value="link">Link</option>
       </select>
       <label>Contenuto</label>
       <textarea id="resContent"></textarea>
+      <div id="contentHint" class="hint">Incolla documenti di testo, piani di lezione o UdA</div>
       <button class="btn" onclick="saveResource()">Salva</button>
       <button class="btn btn-plain" onclick="closeModal('resourceModal')">Annulla</button>
     </div>
@@ -211,9 +213,17 @@
     if(r.tipo==="testo"){html+=`<div>${r.contenuto}</div>`}
     if(r.tipo==="video"){
       let url=r.contenuto.trim();
-      if(url.includes("watch?v=")) url=url.replace("watch?v=","embed/");
-      if(url.includes("youtu.be/")) url=url.replace("youtu.be/","www.youtube.com/embed/");
-      if(url.includes("vimeo.com/")&&!url.includes("player.")){url="https://player.vimeo.com/video/"+url.split("/").pop();}
+      if(url.includes("youtube.com/watch")){
+        const videoId=new URL(url).searchParams.get("v");
+        url="https://www.youtube.com/embed/"+videoId;
+      }
+      else if(url.includes("youtu.be/")){
+        const videoId=url.split("youtu.be/")[1].split("?")[0];
+        url="https://www.youtube.com/embed/"+videoId;
+      }
+      else if(url.includes("vimeo.com/")&&!url.includes("player.")){
+        url="https://player.vimeo.com/video/"+url.split("/").pop();
+      }
       html+=`<iframe width="100%" height="450" src="${url}" allowfullscreen></iframe>`;
     }
     if(r.tipo==="link"){html+=`<a href="${r.contenuto}" target="_blank">Vai alla risorsa</a>`}
@@ -233,6 +243,15 @@
   function closeModal(id){$(id).style.display="none"}
   function showSection(s){$("resourcesSection").style.display=s==="resources"?"block":"none";$("playlistsSection").style.display=s==="playlists"?"block":"none";$("navResources").classList.toggle("active",s==="resources");$("navPlaylists").classList.toggle("active",s==="playlists");if(s==="resources")loadResources();else loadPlaylists();}
   function adminLogin(){if($("adminPass").value.trim()==="admin123"){isAdmin=true;$("adminPanel").style.display="flex";$("loginBox").style.display="none";loadResources();loadPlaylists();} else alert("Password errata")}
+
+  // ---- HINT DINAMICO ----
+  function updateContentHint(){
+    const type = $("resType").value;
+    const hint = $("contentHint");
+    if(type==="video") hint.textContent = "Carica da YouTube o da ScreenPal";
+    else if(type==="testo") hint.textContent = "Incolla documenti di testo, piani di lezione o UdA";
+    else if(type==="link") hint.textContent = "Aggiungi il link a una pagina web/ risorsa esterna";
+  }
 
   // ---- INIT ----
   $("searchInput").addEventListener("input",renderResources);
