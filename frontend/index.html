@@ -51,7 +51,7 @@
     .lesson:hover{background:#f0f4ff}
     .lesson.completed{background:#e8f6ec;border-color:#cdebd8}
     .course-content{flex:1;padding:14px;overflow:auto}
-    .hint{font-size:13px;color:var(--muted);margin-top:4px;font-style:italic}
+    .hint{font-size:13px;color:#666;margin-top:4px;font-style:italic}
   </style>
 </head>
 <body>
@@ -94,6 +94,15 @@
     <main id="playlistGrid" class="grid"></main>
   </section>
 
+  <div id="adminPanel" class="admin-panel">
+    <button onclick="openResourceModal()">＋</button>
+    <button onclick="openPlaylistModal()">📚</button>
+  </div>
+  <div id="loginBox" class="login-box">
+    <input id="adminPass" type="password" placeholder="Password admin" />
+    <button onclick="adminLogin()">Login</button>
+  </div>
+
   <!-- Modale CRUD Risorsa -->
   <div id="resourceModal" class="modal">
     <div class="modal-content">
@@ -119,7 +128,7 @@
       </select>
       <label>Tag</label><input id="resTags" type="text" />
       <label>Tipo</label>
-      <select id="resType" onchange="updateHint()">
+      <select id="resType" onchange="updateContentHint()">
         <option value="testo">Testo</option>
         <option value="video">Video</option>
         <option value="link">Link</option>
@@ -156,7 +165,22 @@
   let isAdmin=false,editIndex=null,editPlaylistIndex=null;
   let resources=[], playlists=[];
 
-  // ---- VIEW ----
+  // ---- API CALLS ----
+  async function loadResources(){const res=await fetch(apiBase+"/risorse");resources=await res.json();renderResources();}
+  async function loadPlaylists(){const res=await fetch(apiBase+"/minicorsi");playlists=await res.json();renderPlaylists();}
+
+  // ---- RENDER RISORSE ----
+  function renderResources(){
+    const grid=$("resourceGrid");grid.innerHTML="";
+    const q=$("searchInput").value.toLowerCase();const cat=$("categoryFilter").value;const grade=$("gradeFilter").value;
+    resources.filter(r=>(!cat||r.categoria===cat)&&(!grade||r.grado===grade)&&(r.titolo.toLowerCase().includes(q)||r.descrizione.toLowerCase().includes(q)||(r.tag||"").toLowerCase().includes(q)))
+    .forEach((r,i)=>{const card=document.createElement("div");card.className="card";
+      card.innerHTML=`<h3>${r.titolo}</h3><p>${r.descrizione}</p><small><b>${r.categoria}</b> | ${r.grado}</small>
+      <button class="btn" onclick="openResource(${i},false)">Apri Risorsa</button>`;
+      grid.appendChild(card);});
+  }
+
+  // ---- VIEW RISORSA ----
   function openResource(i,fromCourse){
     const r=resources[i];
     let html=`<h2>${r.titolo}</h2><p>${r.descrizione}</p>`;
@@ -168,13 +192,18 @@
     if(r.tipo==="video"){
       let url=r.contenuto.trim();
 
+      // YouTube "watch?v="
       if(url.includes("youtube.com/watch")){
         const videoId=new URL(url).searchParams.get("v");
         url="https://www.youtube.com/embed/"+videoId;
-      } else if(url.includes("youtu.be/")){
+      }
+      // YouTube short youtu.be
+      else if(url.includes("youtu.be/")){
         const videoId=url.split("youtu.be/")[1].split("?")[0];
         url="https://www.youtube.com/embed/"+videoId;
-      } else if(url.includes("vimeo.com/") && !url.includes("player.")){
+      }
+      // Vimeo
+      else if(url.includes("vimeo.com/") && !url.includes("player.")){
         url="https://player.vimeo.com/video/"+url.split("/").pop();
       }
 
@@ -193,13 +222,13 @@
     }
   }
 
-  // ---- Dynamic hint for content ----
-  function updateHint(){
-    const type=$("resType").value;
-    const hint=$("contentHint");
-    if(type==="video") hint.textContent="Carica da YouTube o da ScreenPal";
-    else if(type==="testo") hint.textContent="Incolla documenti di testo, piani di lezione o UdA";
-    else if(type==="link") hint.textContent="Aggiungi il link a una pagina web/risorsa esterna";
+  // ---- HINT DINAMICO ----
+  function updateContentHint(){
+    const type = $("resType").value;
+    const hint = $("contentHint");
+    if(type==="video") hint.textContent = "Carica da YouTube o da ScreenPal";
+    else if(type==="testo") hint.textContent = "Incolla documenti di testo, piani di lezione o UdA";
+    else if(type==="link") hint.textContent = "Aggiungi il link a una pagina web/ risorsa esterna";
   }
 
   // ---- INIT ----
@@ -215,7 +244,6 @@
   loadResources();
   loadPlaylists();
   showSection("resources");
-  updateHint(); // inizializza suggerimento
 </script>
 </body>
 </html>
