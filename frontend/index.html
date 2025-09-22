@@ -190,16 +190,21 @@
 
 <script>
   const apiBase = "https://piattaforma-risorse-didattiche.onrender.com/api";
+
   const $=id=>document.getElementById(id);
   let isAdmin=false,editIndex=null,editPlaylistIndex=null;
   let resources=[], playlists=[];
 
   // ---- API CALLS ----
   async function loadResources(){
-    const res=await fetch(apiBase+"/risorse");resources=await res.json();renderResources();
+    const res=await fetch(apiBase+"/risorse");
+    resources=await res.json();
+    renderResources();
   }
   async function loadPlaylists(){
-    const res=await fetch(apiBase+"/minicorsi");playlists=await res.json();renderPlaylists();
+    const res=await fetch(apiBase+"/minicorsi");
+    playlists=await res.json();
+    renderPlaylists();
   }
 
   async function saveResource(){
@@ -207,22 +212,44 @@
               grado:$("resGrade").value, tag:$("resTags").value, tipo:$("resType").value,
               contenuto:$("resContent").value };
     let res;
-    if(editIndex!==null){ res=await fetch(apiBase+"/risorse/"+resources[editIndex].id,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(r)});}
-    else{res=await fetch(apiBase+"/risorse",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(r)});}
-    await res.json(); closeModal("resourceModal"); loadResources();
+    if(editIndex!==null){
+      res=await fetch(apiBase+"/risorse/"+resources[editIndex].id,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(r)});
+    } else {
+      res=await fetch(apiBase+"/risorse",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(r)});
+    }
+    await res.json();
+    closeModal("resourceModal");
+    loadResources();
   }
-  async function deleteResource(i){if(confirm("Eliminare?")){await fetch(apiBase+"/risorse/"+resources[i].id,{method:"DELETE"});loadResources()}}
+
+  async function deleteResource(i){
+    if(confirm("Eliminare?")){
+      await fetch(apiBase+"/risorse/"+resources[i].id,{method:"DELETE"});
+      loadResources();
+    }
+  }
 
   async function savePlaylist(){
     const selected=[...$("resourceCheckboxes").querySelectorAll("input:checked")].map(c=>parseInt(c.value));
     const p={ titolo:$("playlistTitleInput").value, descrizione:$("playlistDescInput").value,
               categoria:$("playlistCategory").value, risorse:selected };
     let res;
-    if(editPlaylistIndex!==null){res=await fetch(apiBase+"/minicorsi/"+playlists[editPlaylistIndex].id,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});}
-    else{res=await fetch(apiBase+"/minicorsi",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});}
-    await res.json(); closeModal("playlistModal"); loadPlaylists();
+    if(editPlaylistIndex!==null){
+      res=await fetch(apiBase+"/minicorsi/"+playlists[editPlaylistIndex].id,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});
+    } else {
+      res=await fetch(apiBase+"/minicorsi",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});
+    }
+    await res.json();
+    closeModal("playlistModal");
+    loadPlaylists();
   }
-  async function deletePlaylist(i){if(confirm("Eliminare?")){await fetch(apiBase+"/minicorsi/"+playlists[i].id,{method:"DELETE"});loadPlaylists()}}
+
+  async function deletePlaylist(i){
+    if(confirm("Eliminare?")){
+      await fetch(apiBase+"/minicorsi/"+playlists[i].id,{method:"DELETE"});
+      loadPlaylists();
+    }
+  }
 
   // ---- UI RENDER ----
   function renderResources(){
@@ -242,8 +269,9 @@
       card.innerHTML=`<h3>${p.titolo}</h3><p>${p.descrizione}</p><small>${p.categoria} | ${p.risorse.length} risorse</small>
       <button class="btn" onclick="openCourseView(${i})">Apri Minicorso</button>
       ${isAdmin?`<button class="btn btn-plain" onclick="editPlaylist(${i})">Modifica</button><button class="btn btn-danger" onclick="deletePlaylist(${i})">Elimina</button>`:""}`;
-      grid.appendChild(card)});}
-  
+      grid.appendChild(card)});
+  }
+
   // ---- VIEW ----
   function openResource(i,fromCourse){
     const r=resources[i];let html=`<h2>${r.titolo}</h2><p>${r.descrizione}</p>`;
@@ -263,7 +291,7 @@
 
   function openPlaylistModal(edit=false){
     $("playlistModal").style.display="flex";const c=$("resourceCheckboxes");c.innerHTML="";
-    resources.forEach((r)=>{c.innerHTML+=`<label><input type="checkbox" value="${r.id}"> ${r.titolo}</label><br>`;});
+    resources.forEach((r,i)=>{c.innerHTML+=`<label><input type="checkbox" value="${r.id}"> ${r.titolo}</label><br>`;});
     if(edit){const p=playlists[editPlaylistIndex];$("playlistTitleInput").value=p.titolo;$("playlistDescInput").value=p.descrizione;$("playlistCategory").value=p.categoria;p.risorse.forEach(id=>{$("resourceCheckboxes").querySelector(`input[value="${id}"]`).checked=true})}
     else{$("playlistTitleInput").value="";$("playlistDescInput").value="";$("playlistCategory").value="Coding";editPlaylistIndex=null;}
   }
@@ -271,30 +299,43 @@
 
   // ---- COURSE VIEW ----
   function openCourseView(i){
-    const p=playlists[i];$("courseTitle").textContent=p.titolo;$("lessonList").innerHTML="";
+    const p=playlists[i];
+    $("courseTitle").textContent=p.titolo;
+    $("lessonList").innerHTML="";
     p.risorse.forEach((id)=>{const r=resources.find(x=>x.id===id);if(r){const d=document.createElement("div");d.className="lesson";d.textContent=r.titolo;d.onclick=()=>{openResource(resources.indexOf(r),true);d.classList.add("completed");updateProgress(i)};$("lessonList").appendChild(d)}});
-    updateProgress(i);$("courseView").style.display="flex";
+    // 🔴 RIMOSSO: apertura automatica della prima lezione
+    updateProgress(i);
+    $("courseView").style.display="flex";
   }
-  function updateProgress(i){const done=$("lessonList").querySelectorAll(".lesson.completed").length;$("courseProgress").innerText=`Progresso: ${done}/${playlists[i].risorse.length}`;}
+  function updateProgress(i){const done=$("lessonList").querySelectorAll(".lesson.completed").length;$("courseProgress").innerText=`Progresso: ${done}/${playlists[i].risorse.length}`}
   function closeCourseView(){$("courseView").style.display="none"}
   function closeViewModal(){$("viewModal").style.display="none"}
   function closeModal(id){$(id).style.display="none"}
-  function showSection(s){$("resourcesSection").style.display=s==="resources"?"block":"none";$("playlistsSection").style.display=s==="playlists"?"block":"none";$("navResources").classList.toggle("active",s==="resources");$("navPlaylists").classList.toggle("active",s==="playlists");if(s==="resources")loadResources();else loadPlaylists();}
-  function adminLogin(){if($("adminPass").value.trim()==="admin123"){isAdmin=true;$("adminPanel").style.display="flex";$("loginBox").style.display="none";loadResources();loadPlaylists();} else alert("Password errata")}
+  function showSection(s){
+    $("resourcesSection").style.display=s==="resources"?"block":"none";
+    $("playlistsSection").style.display=s==="playlists"?"block":"none";
+    $("navResources").classList.toggle("active",s==="resources");
+    $("navPlaylists").classList.toggle("active",s==="playlists");
+    if(s==="resources")loadResources();else loadPlaylists();
+  }
+  function adminLogin(){
+    if($("adminPass").value.trim()==="admin123"){
+      isAdmin=true;
+      $("adminPanel").style.display="flex";
+      $("loginBox").style.display="none";
+      loadResources();
+      loadPlaylists();
+    } else alert("Password errata")
+  }
 
   // ---- INIT ----
   $("searchInput").addEventListener("input",renderResources);
   $("categoryFilter").addEventListener("change",renderResources);
   $("gradeFilter").addEventListener("change",renderResources);
-
-  async function initApp(){
-    await loadResources();
-    await loadPlaylists();
-    editIndex=null;editPlaylistIndex=null;
-    showSection("resources"); // <-- sempre e solo Risorse come home
-  }
-
-  initApp();
+  loadResources();
+  loadPlaylists();
+  showSection("resources");
 </script>
 </body>
 </html>
+
