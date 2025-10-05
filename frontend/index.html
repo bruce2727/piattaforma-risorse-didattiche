@@ -1,44 +1,56 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8" />
 <title>Piattaforma Risorse Didattiche</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
 :root {
-  --primary:#4a90e2; --success:#28a745; --danger:#dc3545;
-  --bg:#f9f9f9; --text:#333; --muted:#555; --border:#ddd;
+  --primary:#4a90e2;
+  --success:#28a745;
+  --danger:#dc3545;
+  --bg:#f9f9f9;
+  --text:#333;
+  --muted:#555;
+  --border:#ddd;
 }
-body {font-family:Arial,Helvetica,sans-serif;margin:0;background:var(--bg);color:var(--text);}
-header {background:var(--primary);color:#fff;padding:15px 20px;}
-header h1 {margin:0;font-size:20px;}
-header h2 {margin:5px 0 10px;font-size:15px;font-weight:normal;color:#e1ecff;}
-nav {background:#eee;padding:10px 20px;display:flex;gap:16px;}
-nav a {font-weight:bold;color:#333;text-decoration:none;padding:6px 0;border-bottom:2px solid transparent;}
-nav a.active {color:var(--primary);border-color:var(--primary);}
-.filters {background:#fff;padding:10px;border-bottom:1px solid var(--border);display:flex;gap:10px;flex-wrap:wrap;}
-.filters select {padding:6px;border:1px solid #ccc;border-radius:4px;}
-.grid {display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;padding:20px;}
-.card {background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px;display:flex;flex-direction:column;}
-.card h3 {margin:0;font-size:18px;}
-.card p {margin:6px 0 10px;color:#555;font-size:14px;}
-.card .btn {padding:9px;border:none;border-radius:4px;background:var(--primary);color:#fff;cursor:pointer;}
-.card .btn + .btn {margin-top:6px;}
-.btn-danger {background:var(--danger)!important;}
-.btn-plain {background:#fff;border:1px solid var(--primary);color:var(--primary);}
-.admin-panel {position:fixed;bottom:20px;right:20px;display:none;}
-.menu-btn {background:var(--success);color:#fff;border:none;padding:12px 16px;border-radius:50%;font-size:20px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);}
-.admin-menu {display:none;position:absolute;bottom:60px;right:0;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.2);padding:6px;flex-direction:column;gap:6px;}
-.admin-menu button {background:#fff;border:1px solid var(--primary);color:var(--primary);padding:8px;border-radius:6px;cursor:pointer;text-align:left;width:160px;}
-.login-box {position:fixed;top:15px;right:15px;background:#fff;padding:10px;border:1px solid var(--border);border-radius:8px;display:flex;gap:8px;}
-.login-box input {padding:8px;border:1px solid #ccc;border-radius:6px;}
-.login-box button {padding:8px 12px;border:none;border-radius:6px;background:var(--primary);color:#fff;cursor:pointer;}
-.modal {display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);justify-content:center;align-items:center;z-index:1200;}
-.modal-content {background:#fff;padding:20px;border-radius:10px;width:90%;max-width:600px;}
-.close-btn {float:right;border:none;background:#fff;color:var(--primary);border:1px solid var(--primary);border-radius:5px;padding:6px 10px;cursor:pointer;}
-#loader {display:none;position:fixed;inset:0;background:rgba(255,255,255,.8);z-index:1500;justify-content:center;align-items:center;flex-direction:column;font-size:18px;color:var(--primary);}
-.spinner {border:6px solid #f3f3f3;border-top:6px solid var(--primary);border-radius:50%;width:50px;height:50px;animation:spin 1s linear infinite}
-@keyframes spin {100%{transform:rotate(360deg)}}
+*{box-sizing:border-box}
+body{font-family:Arial,Helvetica,sans-serif;margin:0;background:var(--bg);color:var(--text)}
+header{background:var(--primary);color:#fff;padding:15px 20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;text-align:left;flex-direction:column}
+header h1{margin:0;font-size:20px}
+header h2{margin:5px 0 0;font-size:15px;font-weight:normal}
+nav{background:#eee;padding:10px 20px;display:flex;gap:16px}
+nav a{font-weight:bold;color:#333;text-decoration:none;cursor:pointer;padding:6px 0;border-bottom:2px solid transparent}
+nav a.active{color:var(--primary);border-color:var(--primary)}
+.filters{background:#fff;padding:15px;display:flex;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--border)}
+.filters select{padding:8px;border:1px solid #ccc;border-radius:4px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;padding:20px;align-items:stretch}
+.card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px;display:flex;flex-direction:column;justify-content:space-between;min-height:240px}
+.card h3{margin:0 0 4px 0;font-size:18px}
+.card p{margin:0 0 8px 0;color:var(--muted);font-size:14px;flex-grow:1}
+.card .btn{width:100%;margin-top:auto;padding:9px 10px;border:none;border-radius:4px;background:var(--primary);color:#fff;cursor:pointer}
+.card .btn + .btn{margin-top:6px}
+.btn-danger{background:var(--danger)!important}
+.btn-plain{background:#fff;border:1px solid var(--primary);color:var(--primary)}
+.admin-panel{position:fixed;bottom:20px;right:20px;display:none;z-index:1100}
+.admin-panel .menu-btn{background:var(--success);color:#fff;border:none;padding:12px 16px;border-radius:50%;font-size:20px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.admin-menu{display:none;position:absolute;bottom:60px;right:0;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.2);padding:6px;flex-direction:column;gap:6px}
+.admin-menu button{background:#fff;border:1px solid var(--primary);color:var(--primary);padding:8px;border-radius:6px;cursor:pointer;text-align:left;width:160px}
+.admin-menu button:hover{background:#f0f4ff}
+.login-box{position:fixed;top:20px;right:20px;background:#fff;padding:10px;border:1px solid var(--border);border-radius:8px;display:flex;gap:8px;z-index:1100}
+.login-box input{padding:8px;border:1px solid #ccc;border-radius:6px}
+.login-box button{padding:8px 12px;border:none;border-radius:6px;background:var(--primary);color:#fff;cursor:pointer}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);justify-content:center;align-items:center;padding:20px;z-index:1200}
+.modal-content{background:#fff;padding:22px;border-radius:10px;min-width:800px;max-width:1000px;width:90%;max-height:90vh;overflow:auto;box-shadow:0 10px 30px rgba(0,0,0,.35);position:relative}
+.modal-header{display:flex;justify-content:flex-end;gap:10px;margin:-10px 0 10px 0}
+.close-btn{cursor:pointer;border:none;background:#fff;color:var(--primary);border:1px solid var(--primary);border-radius:6px;padding:6px 10px}
+.modal-content label{display:block;font-weight:bold;margin-top:12px;margin-bottom:4px}
+.modal-content input[type="text"],.modal-content select,.modal-content textarea{width:100%;padding:10px;border:1px solid #ccc;border-radius:6px}
+.modal-content textarea{min-height:90px;resize:vertical}
+.modal-content .btn{width:100%;padding:10px;margin-top:12px;border:none;border-radius:6px;background:var(--success);color:#fff;cursor:pointer;font-size:15px}
+#loader{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:rgba(255,255,255,0.9);z-index:2000;flex-direction:column;font-size:16px;color:var(--primary);}
+.spinner{border:4px solid #eee;border-top:4px solid var(--primary);border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite;margin-bottom:10px}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -50,6 +62,7 @@ nav a.active {color:var(--primary);border-color:var(--primary);}
 
 <nav>
   <a id="navResources" class="active" onclick="showSection('resources')">Risorse</a>
+  <a id="navPlaylists" onclick="showSection('playlists')">Minicorsi</a>
 </nav>
 
 <section id="resourcesSection">
@@ -60,150 +73,137 @@ nav a.active {color:var(--primary);border-color:var(--primary);}
       <option>Intelligenza Artificiale</option>
       <option>Stampa 3D</option>
       <option>UdA</option>
+      <option>Storytelling e Multimedia</option>
+      <option>Metodologie didattiche</option>
+      <option>App per l'inclusione</option>
+      <option>Digitalizzazione amministrativa</option>
     </select>
     <select id="gradeFilter">
       <option value="">Tutti i gradi</option>
       <option>Infanzia</option>
       <option>Primaria</option>
       <option>Secondaria di primo grado</option>
+      <option>Tutti i gradi</option>
+      <option>Segreteria</option>
     </select>
   </div>
   <main id="resourceGrid" class="grid"></main>
 </section>
 
-<div id="loader">
-  <div class="spinner"></div>
-  <div>Caricamento delle risorse in corso...</div>
-</div>
-
-<div id="loginBox" class="login-box">
-  <input id="adminPass" type="password" placeholder="Password admin">
-  <button onclick="adminLogin()">Login</button>
-</div>
+<section id="playlistsSection" style="display:none;">
+  <main id="playlistGrid" class="grid"></main>
+</section>
 
 <div id="adminPanel" class="admin-panel">
   <button class="menu-btn" onclick="toggleAdminMenu()">＋</button>
   <div id="adminMenu" class="admin-menu">
     <button onclick="openResourceModal()">➕ Nuova Risorsa</button>
+    <button onclick="openPlaylistModal()">➕ Nuovo Minicorso</button>
   </div>
+</div>
+
+<div id="loginBox" class="login-box">
+  <input id="adminPass" type="password" placeholder="Password admin" />
+  <button onclick="adminLogin()">Login</button>
 </div>
 
 <div id="resourceModal" class="modal">
   <div class="modal-content">
-    <button class="close-btn" onclick="closeModal('resourceModal')">Chiudi</button>
-    <h2>Nuova Risorsa</h2>
-    <label>Titolo</label><input id="resTitle" type="text">
+    <h2 id="resourceModalTitle">Aggiungi Risorsa</h2>
+    <label>Titolo</label><input id="resTitle" type="text" />
     <label>Descrizione</label><textarea id="resDesc"></textarea>
-    <label>Categoria</label><select id="resCategory"><option>Coding</option><option>Intelligenza Artificiale</option></select>
-    <label>Grado</label><select id="resGrade"><option>Infanzia</option><option>Primaria</option><option>Secondaria di primo grado</option></select>
-    <label>Tag</label><input id="resTags" type="text">
-    <label>Tipo</label><select id="resType"><option value="testo">Testo</option><option value="video">Video</option><option value="link">Link</option></select>
+    <label>Categoria</label><select id="resCategory">
+      <option>Coding</option><option>Intelligenza Artificiale</option><option>Stampa 3D</option>
+      <option>UdA</option><option>Storytelling e Multimedia</option>
+      <option>Metodologie didattiche</option><option>App per l'inclusione</option>
+      <option>Digitalizzazione amministrativa</option>
+    </select>
+    <label>Grado</label><select id="resGrade">
+      <option>Infanzia</option><option>Primaria</option>
+      <option>Secondaria di primo grado</option><option>Tutti i gradi</option><option>Segreteria</option>
+    </select>
+    <label>Tag</label><input id="resTags" type="text" />
+    <label>Tipo</label><select id="resType" onchange="updateContentHint()">
+      <option value="testo">Testo</option><option value="video">Video</option><option value="link">Link</option>
+    </select>
     <label>Contenuto</label><textarea id="resContent"></textarea>
+    <div id="contentHint" style="font-size:13px;color:#555;margin-top:6px"></div>
     <button class="btn" onclick="saveResource()">Salva</button>
+    <button class="btn btn-plain" onclick="closeModal('resourceModal')">Annulla</button>
   </div>
 </div>
 
-<script>
-const apiBase = "https://piattaforma-risorse-didattiche.onrender.com/api";
-const $ = id => document.getElementById(id);
-let isAdmin = false;
-let resources = [];
+<div id="loader"><div class="spinner"></div>Caricamento risorse...</div>
 
-async function loadResources() {
-  $("loader").style.display = "flex";
-  try {
-    const res = await fetch(apiBase + "/risorse");
-    const data = await res.json();
-    resources = Array.isArray(data) ? data : [];
+<script>
+const apiBase = window.location.origin.includes("render")
+  ? "https://piattaforma-risorse-didattiche.onrender.com/api"
+  : "http://localhost:5000/api";
+
+const $=id=>document.getElementById(id);
+let isAdmin=false,resources=[];
+
+async function loadResources(){
+  $("loader").style.display="flex";
+  try{
+    const res=await fetch(apiBase+"/risorse");
+    if(!res.ok)throw new Error("Errore caricamento risorse");
+    resources=await res.json();
     renderResources();
-  } catch (err) {
-    alert("Errore nel caricamento delle risorse. Controlla la console.");
-    console.error("Errore:", err);
-  } finally {
-    $("loader").style.display = "none";
-  }
+  }catch(err){console.error(err);alert("Errore nel caricamento delle risorse.");}
+  $("loader").style.display="none";
 }
 
-async function saveResource() {
-  const payload = {
-    titolo: $("resTitle").value.trim(),
-    descrizione: $("resDesc").value.trim(),
-    categoria: $("resCategory").value.trim(),
-    grado: $("resGrade").value.trim(),
-    tag: $("resTags").value.trim(),
-    tipo: $("resType").value.trim(),
-    contenuto: $("resContent").value.trim()
+function renderResources(){
+  const grid=$("resourceGrid");grid.innerHTML="";
+  resources.forEach((r,i)=>{
+    const card=document.createElement("div");card.className="card";
+    card.innerHTML=`<h3>${r.titolo}</h3><p>${r.descrizione}</p>
+    <small><b>${r.categoria}</b> | ${r.grado}</small>`;
+    grid.appendChild(card);
+  });
+}
+
+async function saveResource(){
+  const r={
+    titolo:$("resTitle").value,
+    descrizione:$("resDesc").value,
+    categoria:$("resCategory").value,
+    grado:$("resGrade").value,
+    tag:$("resTags").value,
+    tipo:$("resType").value,
+    contenuto:$("resContent").value
   };
-  Object.keys(payload).forEach(k => { if(payload[k] === "") delete payload[k]; });
-
-  try {
-    const res = await fetch(apiBase + "/risorse", {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify(payload)
-    });
-
-    if (!res.ok) {
-      const errText = await res.text();
-      console.error("Errore backend:", errText);
-      alert("Errore nel salvataggio della risorsa. Controlla la console.");
-      return;
-    }
-
-    await res.json();
+  try{
+    const res=await fetch(apiBase+"/risorse",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(r)});
+    const data=await res.json();
+    if(!res.ok)throw new Error(data.error||"Errore salvataggio");
     closeModal("resourceModal");
     await loadResources();
-  } catch (err) {
-    console.error("Errore:", err);
-    alert("Errore nel salvataggio della risorsa. Controlla la console.");
-  }
+  }catch(err){console.error("Errore backend:",err);alert("Errore nel salvataggio della risorsa.");}
 }
 
-function renderResources() {
-  const grid = $("resourceGrid");
-  grid.innerHTML = "";
-  const cat = $("categoryFilter").value;
-  const grade = $("gradeFilter").value;
-  resources
-    .filter(r => (!cat || r.categoria === cat) && (!grade || r.grado === grade))
-    .forEach(r => {
-      const card = document.createElement("div");
-      card.className = "card";
-      card.innerHTML = `
-        <h3>${r.titolo}</h3>
-        <p>${r.descrizione}</p>
-        <small>${r.categoria} | ${r.grado}</small>
-        <button class="btn" onclick="alert('Apri risorsa: ${r.titolo}')">Apri</button>
-      `;
-      grid.appendChild(card);
-    });
+function updateContentHint(){
+  const type=$("resType").value;
+  let hint="";
+  if(type==="video")hint="Suggerimento: incolla un link da YouTube o Vimeo.";
+  else if(type==="testo")hint="Suggerimento: scrivi o incolla un testo o piano di lezione.";
+  else if(type==="link")hint="Suggerimento: aggiungi un link esterno a una risorsa web.";
+  $("contentHint").textContent=hint;
 }
 
-function openResourceModal() {
-  $("resourceModal").style.display = "flex";
-  ["resTitle","resDesc","resTags","resContent"].forEach(id => $(id).value = "");
-}
-
-function closeModal(id){ $(id).style.display="none"; }
-function toggleAdminMenu(){
-  const menu = $("adminMenu");
-  menu.style.display = menu.style.display==="flex" ? "none" : "flex";
-}
-function adminLogin(){
-  if($("adminPass").value==="admin123"){
-    isAdmin=true;
-    $("loginBox").style.display="none";
-    $("adminPanel").style.display="block";
-  } else alert("Password errata");
-}
-
-$("categoryFilter").addEventListener("change",renderResources);
-$("gradeFilter").addEventListener("change",renderResources);
-
+function closeModal(id){$(id).style.display="none";}
+function openResourceModal(){$("resourceModal").style.display="flex";}
+function toggleAdminMenu(){const m=$("adminMenu");m.style.display=m.style.display==="flex"?"none":"flex";}
+function adminLogin(){if($("adminPass").value.trim()==="admin123"){isAdmin=true;$("adminPanel").style.display="block";$("loginBox").style.display="none";alert("Accesso Admin effettuato.");}else alert("Password errata");}
+function showSection(s){$("resourcesSection").style.display=s==="resources"?"block":"none";$("playlistsSection").style.display=s==="playlists"?"block":"none";$("navResources").classList.toggle("active",s==="resources");$("navPlaylists").classList.toggle("active",s==="playlists");if(s==="resources")loadResources();}
 loadResources();
 </script>
+
 </body>
 </html>
+
+
 
 
 
