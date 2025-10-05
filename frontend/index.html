@@ -12,7 +12,7 @@
     *{box-sizing:border-box}
     body{font-family:Arial,Helvetica,sans-serif;margin:0;background:var(--bg);color:var(--text)}
     header{background:var(--primary);color:#fff;padding:15px 20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-    header h1{margin:0;font-size:20px;flex:0 0 auto}
+    header h1{margin:0;font-size:18px;flex:0 0 auto}
     header .search-wrap{flex:1 1 260px;min-width:240px}
     header input[type="text"]{width:100%;padding:10px;border:none;border-radius:4px}
     nav{background:#eee;padding:10px 20px;display:flex;gap:16px}
@@ -28,9 +28,11 @@
     .card .btn + .btn{margin-top:6px}
     .btn-danger{background:var(--danger)!important}
     .btn-plain{background:#fff;border:1px solid var(--primary);color:var(--primary)}
-    .admin-panel{position:fixed;bottom:20px;right:20px;display:none;gap:10px;z-index:1100}
-    .admin-panel button{background:var(--success);color:#fff;border:none;padding:12px 16px;border-radius:50%;font-size:20px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15)}
-    .admin-panel button:nth-child(2){background:var(--primary)}
+    .admin-panel{position:fixed;bottom:20px;right:20px;display:none;z-index:1100}
+    .admin-panel .menu-btn{background:var(--success);color:#fff;border:none;padding:12px 16px;border-radius:50%;font-size:20px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+    .admin-menu{display:none;position:absolute;bottom:60px;right:0;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.2);padding:6px;flex-direction:column;gap:6px}
+    .admin-menu button{background:#fff;border:1px solid var(--primary);color:var(--primary);padding:8px;border-radius:6px;cursor:pointer;text-align:left;width:160px}
+    .admin-menu button:hover{background:#f0f4ff}
     .login-box{position:fixed;bottom:20px;left:20px;background:#fff;padding:10px;border:1px solid var(--border);border-radius:8px;display:flex;gap:8px;z-index:1100}
     .login-box input{padding:8px;border:1px solid #ccc;border-radius:6px}
     .login-box button{padding:8px 12px;border:none;border-radius:6px;background:var(--primary);color:#fff;cursor:pointer}
@@ -51,27 +53,12 @@
     .lesson:hover{background:#f0f4ff}
     .lesson.completed{background:#e8f6ec;border-color:#cdebd8}
     .course-content{flex:1;padding:14px;overflow:auto}
-
-    /* LOADER */
-    #loader {
-      position: fixed;
-      inset: 0;
-      background: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 20px;
-      color: var(--primary);
-      z-index: 2000;
-    }
   </style>
 </head>
 <body>
-  <div id="loader">Caricamento in corso...</div>
-
   <header>
-    <h1>Piattaforma Risorse Didattiche</h1>
-    <div class="search-wrap">
+    <h1>Piattaforma Risorse Didattiche<br> a cura della Comunità di Pratiche dell'Istituto Comprensivo 3 di Alghero</h1>
+	 <div class="search-wrap">
       <input id="searchInput" type="text" placeholder="Cerca per tag o parola chiave..." />
     </div>
   </header>
@@ -92,6 +79,7 @@
         <option>Storytelling e Multimedia</option>
         <option>Metodologie didattiche</option>
         <option>App per l'inclusione</option>
+		    <option>Digitalizzazione amministrativa</option>
       </select>
       <select id="gradeFilter">
         <option value="">Tutti i gradi</option>
@@ -99,6 +87,7 @@
         <option>Primaria</option>
         <option>Secondaria di primo grado</option>
         <option>Tutti i gradi</option>
+		    <option>Segreteria</option>
       </select>
     </div>
     <main id="resourceGrid" class="grid"></main>
@@ -108,10 +97,15 @@
     <main id="playlistGrid" class="grid"></main>
   </section>
 
+  <!-- Admin Panel -->
   <div id="adminPanel" class="admin-panel">
-    <button onclick="openResourceModal()">＋</button>
-    <button onclick="openPlaylistModal()">📚</button>
+    <button class="menu-btn" onclick="toggleAdminMenu()">＋</button>
+    <div id="adminMenu" class="admin-menu">
+      <button onclick="openResourceModal()">➕ Nuova Risorsa</button>
+      <button onclick="openPlaylistModal()">➕ Nuovo Minicorso</button>
+    </div>
   </div>
+
   <div id="loginBox" class="login-box">
     <input id="adminPass" type="password" placeholder="Password admin" />
     <button onclick="adminLogin()">Login</button>
@@ -142,6 +136,7 @@
         <option>Storytelling e Multimedia</option>
         <option>Metodologie didattiche</option>
         <option>App per l'inclusione</option>
+		    <option>Digitalizzazione amministrativa</option>
       </select>
       <label>Grado</label>
       <select id="resGrade">
@@ -149,15 +144,17 @@
         <option>Primaria</option>
         <option>Secondaria di primo grado</option>
         <option>Tutti i gradi</option>
+		    <option>Segreteria</option>
       </select>
       <label>Tag</label><input id="resTags" type="text" />
       <label>Tipo</label>
-      <select id="resType">
+      <select id="resType" onchange="updateContentHint()">
         <option value="testo">Testo</option>
         <option value="video">Video</option>
         <option value="link">Link</option>
       </select>
       <label>Contenuto</label><textarea id="resContent"></textarea>
+      <div id="contentHint" style="font-size:13px;color:#555;margin-top:6px"></div>
       <button class="btn" onclick="saveResource()">Salva</button>
       <button class="btn btn-plain" onclick="closeModal('resourceModal')">Annulla</button>
     </div>
@@ -170,7 +167,7 @@
       <label>Titolo</label><input id="playlistTitleInput" type="text" />
       <label>Descrizione</label><textarea id="playlistDescInput"></textarea>
       <label>Categoria</label>
-      <select id="playlistCategory">
+      <select id="playlistCategory" onchange="filterResourcesByCategory()">
         <option>Coding</option>
         <option>Intelligenza Artificiale</option>
         <option>Stampa 3D</option>
@@ -178,6 +175,7 @@
         <option>Storytelling e Multimedia</option>
         <option>Metodologie didattiche</option>
         <option>App per l'inclusione</option>
+		    <option>Digitalizzazione amministrativa</option>
       </select>
       <label>Seleziona risorse</label><div id="resourceCheckboxes"></div>
       <button class="btn" onclick="savePlaylist()">Salva</button>
@@ -211,10 +209,10 @@
 
   // ---- API CALLS ----
   async function loadResources(){
-    const res=await fetch(apiBase+"/risorse");resources=await res.json();renderResources();return true;
+    const res=await fetch(apiBase+"/risorse");resources=await res.json();renderResources();
   }
   async function loadPlaylists(){
-    const res=await fetch(apiBase+"/minicorsi");playlists=await res.json();renderPlaylists();return true;
+    const res=await fetch(apiBase+"/minicorsi");playlists=await res.json();renderPlaylists();
   }
 
   async function saveResource(){
@@ -226,24 +224,26 @@
     else{res=await fetch(apiBase+"/risorse",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(r)});}
     await res.json(); closeModal("resourceModal"); loadResources();
   }
-
-  async function deleteResource(i){
-    if(confirm("Eliminare?")){await fetch(apiBase+"/risorse/"+resources[i].id,{method:"DELETE"});loadResources()}
-  }
+  async function deleteResource(i){if(confirm("Eliminare?")){await fetch(apiBase+"/risorse/"+resources[i].id,{method:"DELETE"});loadResources()}}
 
   async function savePlaylist(){
     const selected=[...$("resourceCheckboxes").querySelectorAll("input:checked")].map(c=>parseInt(c.value));
-    const p={ titolo:$("playlistTitleInput").value, descrizione:$("playlistDescInput").value,
-              categoria:$("playlistCategory").value, risorse:selected };
+    const p={ 
+      titolo:$("playlistTitleInput").value, 
+      descrizione:$("playlistDescInput").value,
+      categoria:$("playlistCategory").value, 
+      risorse: JSON.stringify(selected)
+    };
     let res;
-    if(editPlaylistIndex!==null){res=await fetch(apiBase+"/minicorsi/"+playlists[editPlaylistIndex].id,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});}
-    else{res=await fetch(apiBase+"/minicorsi",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});}
+    if(editPlaylistIndex!==null){
+      res=await fetch(apiBase+"/minicorsi/"+playlists[editPlaylistIndex].id,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});
+    }
+    else{
+      res=await fetch(apiBase+"/minicorsi",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});
+    }
     await res.json(); closeModal("playlistModal"); loadPlaylists();
   }
-
-  async function deletePlaylist(i){
-    if(confirm("Eliminare?")){await fetch(apiBase+"/minicorsi/"+playlists[i].id,{method:"DELETE"});loadPlaylists()}
-  }
+  async function deletePlaylist(i){if(confirm("Eliminare?")){await fetch(apiBase+"/minicorsi/"+playlists[i].id,{method:"DELETE"});loadPlaylists()}}
 
   // ---- UI RENDER ----
   function renderResources(){
@@ -259,12 +259,15 @@
 
   function renderPlaylists(){
     const grid=$("playlistGrid");grid.innerHTML="";
-    playlists.forEach((p,i)=>{const card=document.createElement("div");card.className="card";
-      card.innerHTML=`<h3>${p.titolo}</h3><p>${p.descrizione}</p><small>${p.categoria} | ${p.risorse.length} risorse</small>
+    playlists.forEach((p,i)=>{
+      const risorse = Array.isArray(p.risorse) ? p.risorse : JSON.parse(p.risorse || "[]");
+      const card=document.createElement("div");card.className="card";
+      card.innerHTML=`<h3>${p.titolo}</h3><p>${p.descrizione}</p><small>${p.categoria} | ${risorse.length} risorse</small>
       <button class="btn" onclick="openCourseView(${i})">Apri Minicorso</button>
       ${isAdmin?`<button class="btn btn-plain" onclick="editPlaylist(${i})">Modifica</button><button class="btn btn-danger" onclick="deletePlaylist(${i})">Elimina</button>`:""}`;
-      grid.appendChild(card)});}
-
+      grid.appendChild(card)});
+  }
+  
   // ---- VIEW ----
   function openResource(i,fromCourse){
     const r=resources[i];let html=`<h2>${r.titolo}</h2><p>${r.descrizione}</p>`;
@@ -277,49 +280,115 @@
   // ---- FORMS ----
   function openResourceModal(edit=false){
     $("resourceModal").style.display="flex";
-    if(edit){const r=resources[editIndex];$("resTitle").value=r.titolo;$("resDesc").value=r.descrizione;$("resCategory").value=r.categoria;$("resGrade").value=r.grado;$("resTags").value=r.tag;$("resType").value=r.tipo;$("resContent").value=r.contenuto}
-    else{$("resTitle").value="";$("resDesc").value="";$("resCategory").value="Coding";$("resGrade").value="Primaria";$("resTags").value="";$("resType").value="testo";$("resContent").value="";editIndex=null}
+    if(edit){
+      const r=resources[editIndex];
+      $("resTitle").value=r.titolo;
+      $("resDesc").value=r.descrizione;
+      $("resCategory").value=r.categoria;
+      $("resGrade").value=r.grado;
+      $("resTags").value=r.tag;
+      $("resType").value=r.tipo;
+      $("resContent").value=r.contenuto;
+    } else {
+      $("resTitle").value="";
+      $("resDesc").value="";
+      $("resCategory").value="Coding";
+      $("resGrade").value="Primaria";
+      $("resTags").value="";
+      $("resType").value="testo";
+      $("resContent").value="";
+      editIndex=null;
+    }
+    updateContentHint();
   }
   function editResource(i){editIndex=i;openResourceModal(true)}
 
   function openPlaylistModal(edit=false){
-    $("playlistModal").style.display="flex";const c=$("resourceCheckboxes");c.innerHTML="";
-    resources.forEach((r,i)=>{c.innerHTML+=`<label><input type="checkbox" value="${r.id}"> ${r.titolo}</label><br>`;});
-    if(edit){const p=playlists[editPlaylistIndex];$("playlistTitleInput").value=p.titolo;$("playlistDescInput").value=p.descrizione;$("playlistCategory").value=p.categoria;p.risorse.forEach(id=>{$("resourceCheckboxes").querySelector(`input[value="${id}"]`).checked=true})}
-    else{$("playlistTitleInput").value="";$("playlistDescInput").value="";$("playlistCategory").value="Coding";editPlaylistIndex=null;}
+    $("playlistModal").style.display="flex";
+    populateResourceCheckboxes();
+    if(edit){
+      const p=playlists[editPlaylistIndex];
+      const risorse = Array.isArray(p.risorse) ? p.risorse : JSON.parse(p.risorse || "[]");
+      $("playlistTitleInput").value=p.titolo;
+      $("playlistDescInput").value=p.descrizione;
+      $("playlistCategory").value=p.categoria;
+      filterResourcesByCategory();
+      risorse.forEach(id=>{$("resourceCheckboxes").querySelector(`input[value="${id}"]`).checked=true});
+    }
+    else{$("playlistTitleInput").value="";$("playlistDescInput").value="";$("playlistCategory").value="Coding";editPlaylistIndex=null;filterResourcesByCategory();}
   }
   function editPlaylist(i){editPlaylistIndex=i;openPlaylistModal(true)}
 
   // ---- COURSE VIEW ----
   function openCourseView(i){
     const p=playlists[i];
+    const risorse = Array.isArray(p.risorse) ? p.risorse : JSON.parse(p.risorse || "[]");
     $("courseTitle").textContent=p.titolo;
     $("lessonList").innerHTML="";
-    p.risorse.forEach((id)=>{const r=resources.find(x=>x.id===id);if(r){const d=document.createElement("div");d.className="lesson";d.textContent=r.titolo;d.onclick=()=>{openResource(resources.indexOf(r),true);d.classList.add("completed");updateProgress(i)};$("lessonList").appendChild(d)}});}
-  function updateProgress(i){const done=$("lessonList").querySelectorAll(".lesson.completed").length;$("courseProgress").innerText=`Progresso: ${done}/${playlists[i].risorse.length}`}
+    risorse.forEach((id)=>{const r=resources.find(x=>x.id===id);if(r){const d=document.createElement("div");d.className="lesson";d.textContent=r.titolo;d.onclick=()=>{openResource(resources.indexOf(r),true);d.classList.add("completed");updateProgress(i)};$("lessonList").appendChild(d)}});
+    updateProgress(i);$("courseView").style.display="flex"
+  }
+  function updateProgress(i){
+    const p=playlists[i];
+    const risorse = Array.isArray(p.risorse) ? p.risorse : JSON.parse(p.risorse || "[]");
+    const done=$("lessonList").querySelectorAll(".lesson.completed").length;
+    $("courseProgress").innerText=`Progresso: ${done}/${risorse.length}`;
+  }
   function closeCourseView(){$("courseView").style.display="none"}
   function closeViewModal(){$("viewModal").style.display="none"}
   function closeModal(id){$(id).style.display="none"}
   function showSection(s){$("resourcesSection").style.display=s==="resources"?"block":"none";$("playlistsSection").style.display=s==="playlists"?"block":"none";$("navResources").classList.toggle("active",s==="resources");$("navPlaylists").classList.toggle("active",s==="playlists");if(s==="resources")loadResources();else loadPlaylists();}
-  function adminLogin(){if($("adminPass").value.trim()==="admin123"){isAdmin=true;$("adminPanel").style.display="flex";$("loginBox").style.display="none";loadResources();loadPlaylists();} else alert("Password errata")}
+  function adminLogin(){if($("adminPass").value.trim()==="admin123"){isAdmin=true;$("adminPanel").style.display="block";$("loginBox").style.display="none";loadResources();loadPlaylists();} else alert("Password errata")}
 
-  async function initApp(){
-    $("courseView").style.display="none";
-    $("viewModal").style.display="none";
-    $("resourceModal").style.display="none";
-    $("playlistModal").style.display="none";
-    try { await Promise.all([loadResources(), loadPlaylists()]); } catch(e){ console.error(e); }
-    $("loader").style.display="none";
-    showSection("resources");
+  // ---- HINTS ----
+  function updateContentHint(){
+    const type = $("resType").value;
+    let hint = "";
+    if(type === "video"){
+      hint = "Suggerimento: incolla un link da pagina YouTube o ScreenPal.";
+    } else if(type === "testo"){
+      hint = "Suggerimento: Scrivi o incolla documenti di testo, piani di lezione o UdA.";
+    } else if(type === "link"){
+      hint = "Suggerimento: aggiungi il link a una pagina web o a una risorsa esterna.";
+    }
+    $("contentHint").textContent = hint;
   }
 
+  // ---- RESOURCE FILTER IN PLAYLIST ----
+  function populateResourceCheckboxes(){
+    const c=$("resourceCheckboxes");c.innerHTML="";
+    resources.forEach((r)=>{c.innerHTML+=`<label><input type="checkbox" value="${r.id}"> ${r.titolo} (${r.categoria})</label><br>`;});
+  }
+  function filterResourcesByCategory(){
+    const selectedCat=$("playlistCategory").value;
+    const c=$("resourceCheckboxes");c.innerHTML="";
+    resources.filter(r=>r.categoria===selectedCat).forEach((r)=>{c.innerHTML+=`<label><input type="checkbox" value="${r.id}"> ${r.titolo}</label><br>`;});
+  }
+
+  // ---- ADMIN MENU ----
+  function toggleAdminMenu(){
+    const menu=$("adminMenu");
+    menu.style.display = (menu.style.display==="flex") ? "none" : "flex";
+  }
+
+  // ---- INIT ----
   $("searchInput").addEventListener("input",renderResources);
   $("categoryFilter").addEventListener("change",renderResources);
   $("gradeFilter").addEventListener("change",renderResources);
-  window.addEventListener("load", initApp);
+
+  $("courseView").style.display = "none";
+  $("viewModal").style.display = "none";
+  $("resourceModal").style.display = "none";
+  $("playlistModal").style.display = "none";
+
+  loadResources();
+  loadPlaylists();
+  showSection("resources");
 </script>
 </body>
 </html>
+
+
 
 
 
