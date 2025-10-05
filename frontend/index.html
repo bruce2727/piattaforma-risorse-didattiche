@@ -1,260 +1,210 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <title>Piattaforma Risorse Didattiche</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    :root {
-      --primary:#4a90e2; --success:#28a745; --danger:#dc3545;
-      --bg:#f9f9f9; --text:#333; --muted:#555; --border:#ddd;
-    }
-    *{box-sizing:border-box}
-    body{font-family:Arial,Helvetica,sans-serif;margin:0;background:var(--bg);color:var(--text)}
-    header{background:var(--primary);color:#fff;padding:15px 20px;display:flex;flex-direction:column;align-items:flex-start;gap:8px}
-    header h1{margin:0;font-size:20px}
-    header h2{margin:0;font-size:15px;font-weight:normal;opacity:0.9}
-    header .search-wrap{width:100%;max-width:500px;margin-top:8px}
-    header input[type="text"]{width:100%;padding:10px;border:none;border-radius:4px}
-    nav{background:#eee;padding:10px 20px;display:flex;gap:16px}
-    nav a{font-weight:bold;color:#333;text-decoration:none;cursor:pointer;padding:6px 0;border-bottom:2px solid transparent}
-    nav a.active{color:var(--primary);border-color:var(--primary)}
-    .filters{background:#fff;padding:15px;display:flex;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--border)}
-    .filters select{padding:8px;border:1px solid #ccc;border-radius:4px}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;padding:20px;align-items:stretch}
-    .card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px;display:flex;flex-direction:column;justify-content:space-between;min-height:240px}
-    .card h3{margin:0 0 4px 0;font-size:18px}
-    .card p{margin:0 0 8px 0;color:var(--muted);font-size:14px;flex-grow:1}
-    .card .btn{width:100%;margin-top:auto;padding:9px 10px;border:none;border-radius:4px;background:var(--primary);color:#fff;cursor:pointer}
-    .btn-danger{background:var(--danger)!important}
-    .btn-plain{background:#fff;border:1px solid var(--primary);color:var(--primary)}
-    .admin-panel{position:fixed;bottom:20px;right:20px;display:none;z-index:1100}
-    .admin-panel .menu-btn{background:var(--success);color:#fff;border:none;padding:12px 16px;border-radius:50%;font-size:20px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15)}
-    .admin-menu{display:none;position:absolute;bottom:60px;right:0;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.2);padding:6px;flex-direction:column;gap:6px}
-    .admin-menu button{background:#fff;border:1px solid var(--primary);color:var(--primary);padding:8px;border-radius:6px;cursor:pointer;text-align:left;width:160px}
-    .admin-menu button:hover{background:#f0f4ff}
-    .login-box{position:fixed;top:20px;right:20px;background:#fff;padding:10px;border:1px solid var(--border);border-radius:8px;display:flex;gap:8px;z-index:1100}
-    .login-box input{padding:8px;border:1px solid #ccc;border-radius:6px}
-    .login-box button{padding:8px 12px;border:none;border-radius:6px;background:var(--primary);color:#fff;cursor:pointer}
-    .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);justify-content:center;align-items:center;padding:20px;z-index:1200}
-    .modal-content{background:#fff;padding:22px;border-radius:10px;min-width:800px;max-width:1000px;width:90%;max-height:90vh;overflow:auto;box-shadow:0 10px 30px rgba(0,0,0,.35);position:relative}
-    .close-btn{cursor:pointer;border:none;background:#fff;color:var(--primary);border:1px solid var(--primary);border-radius:6px;padding:6px 10px}
-    .course-view{display:none;position:fixed;inset:0;background:#fff;z-index:1150;display:flex;flex-direction:column}
-    .course-header{background:var(--primary);color:#fff;padding:10px 12px;display:flex;justify-content:space-between;align-items:center}
-    .course-body{flex:1;display:flex;min-height:0}
-    .course-sidebar{width:280px;border-right:1px solid var(--border);padding:12px;overflow:auto;background:#f7f7f7}
-    .lesson{cursor:pointer;padding:8px;border-radius:6px;margin-bottom:6px;background:#fff;border:1px solid #eee}
-    .lesson:hover{background:#f0f4ff}
-    .lesson.completed{background:#e8f6ec;border-color:#cdebd8}
-    .course-content{flex:1;padding:14px;overflow:auto}
-    #loaderOverlay{position:fixed;inset:0;background:rgba(255,255,255,0.9);display:flex;justify-content:center;align-items:center;z-index:1300}
-    #loaderOverlay.hidden{display:none}
-    .spinner{border:6px solid #ddd;border-top:6px solid var(--primary);border-radius:50%;width:60px;height:60px;animation:spin 1s linear infinite}
-    @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Piattaforma Risorse Didattiche</title>
+<style>
+:root {
+  --primary:#4a90e2; --success:#28a745; --danger:#dc3545;
+  --bg:#f9f9f9; --text:#333; --muted:#555; --border:#ddd;
+}
+body {font-family:Arial,Helvetica,sans-serif;margin:0;background:var(--bg);color:var(--text);}
+header {background:var(--primary);color:#fff;padding:15px 20px;}
+header h1 {margin:0;font-size:20px;}
+header h2 {margin:5px 0 10px;font-size:15px;font-weight:normal;color:#e1ecff;}
+nav {background:#eee;padding:10px 20px;display:flex;gap:16px;}
+nav a {font-weight:bold;color:#333;text-decoration:none;padding:6px 0;border-bottom:2px solid transparent;}
+nav a.active {color:var(--primary);border-color:var(--primary);}
+.filters {background:#fff;padding:10px;border-bottom:1px solid var(--border);display:flex;gap:10px;flex-wrap:wrap;}
+.filters select {padding:6px;border:1px solid #ccc;border-radius:4px;}
+.grid {display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;padding:20px;}
+.card {background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px;display:flex;flex-direction:column;}
+.card h3 {margin:0;font-size:18px;}
+.card p {margin:6px 0 10px;color:#555;font-size:14px;}
+.card .btn {padding:9px;border:none;border-radius:4px;background:var(--primary);color:#fff;cursor:pointer;}
+.card .btn + .btn {margin-top:6px;}
+.btn-danger {background:var(--danger)!important;}
+.btn-plain {background:#fff;border:1px solid var(--primary);color:var(--primary);}
+.admin-panel {position:fixed;bottom:20px;right:20px;display:none;}
+.menu-btn {background:var(--success);color:#fff;border:none;padding:12px 16px;border-radius:50%;font-size:20px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);}
+.admin-menu {display:none;position:absolute;bottom:60px;right:0;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.2);padding:6px;flex-direction:column;gap:6px;}
+.admin-menu button {background:#fff;border:1px solid var(--primary);color:var(--primary);padding:8px;border-radius:6px;cursor:pointer;text-align:left;width:160px;}
+.login-box {position:fixed;top:15px;right:15px;background:#fff;padding:10px;border:1px solid var(--border);border-radius:8px;display:flex;gap:8px;}
+.login-box input {padding:8px;border:1px solid #ccc;border-radius:6px;}
+.login-box button {padding:8px 12px;border:none;border-radius:6px;background:var(--primary);color:#fff;cursor:pointer;}
+.modal {display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);justify-content:center;align-items:center;z-index:1200;}
+.modal-content {background:#fff;padding:20px;border-radius:10px;width:90%;max-width:600px;}
+.close-btn {float:right;border:none;background:#fff;color:var(--primary);border:1px solid var(--primary);border-radius:5px;padding:6px 10px;cursor:pointer;}
+#loader {display:none;position:fixed;inset:0;background:rgba(255,255,255,.8);z-index:1500;justify-content:center;align-items:center;flex-direction:column;font-size:18px;color:var(--primary);}
+.spinner {border:6px solid #f3f3f3;border-top:6px solid var(--primary);border-radius:50%;width:50px;height:50px;animation:spin 1s linear infinite}
+@keyframes spin {100%{transform:rotate(360deg)}}
+</style>
 </head>
 <body>
-  <div id="loaderOverlay">
-    <div>
-      <div class="spinner" style="margin:auto"></div>
-      <p style="text-align:center;margin-top:10px;color:#4a90e2;">Caricamento delle risorse in corso...</p>
-    </div>
+
+<header>
+  <h1>Piattaforma Risorse Didattiche</h1>
+  <h2>a cura della Comunità di Pratiche dell'Istituto Comprensivo 3 di Alghero</h2>
+</header>
+
+<nav>
+  <a id="navResources" class="active" onclick="showSection('resources')">Risorse</a>
+</nav>
+
+<section id="resourcesSection">
+  <div class="filters">
+    <select id="categoryFilter">
+      <option value="">Tutte le categorie</option>
+      <option>Coding</option>
+      <option>Intelligenza Artificiale</option>
+      <option>Stampa 3D</option>
+      <option>UdA</option>
+    </select>
+    <select id="gradeFilter">
+      <option value="">Tutti i gradi</option>
+      <option>Infanzia</option>
+      <option>Primaria</option>
+      <option>Secondaria di primo grado</option>
+    </select>
   </div>
+  <main id="resourceGrid" class="grid"></main>
+</section>
 
-  <header>
-    <h1>Piattaforma Risorse Didattiche</h1>
-    <h2>a cura della Comunità di Pratiche dell'Istituto Comprensivo 3 di Alghero</h2>
-    <div class="search-wrap">
-      <input id="searchInput" type="text" placeholder="Cerca per tag o parola chiave..." />
-    </div>
-  </header>
+<div id="loader">
+  <div class="spinner"></div>
+  <div>Caricamento delle risorse in corso...</div>
+</div>
 
-  <nav>
-    <a id="navResources" class="active" onclick="showSection('resources')">Risorse</a>
-    <a id="navPlaylists" onclick="showSection('playlists')">Minicorsi</a>
-  </nav>
+<div id="loginBox" class="login-box">
+  <input id="adminPass" type="password" placeholder="Password admin">
+  <button onclick="adminLogin()">Login</button>
+</div>
 
-  <section id="resourcesSection">
-    <div class="filters">
-      <select id="categoryFilter">
-        <option value="">Tutte le categorie</option>
-        <option>Coding</option>
-        <option>Intelligenza Artificiale</option>
-        <option>Stampa 3D</option>
-        <option>UdA</option>
-        <option>Storytelling e Multimedia</option>
-        <option>Metodologie didattiche</option>
-        <option>App per l'inclusione</option>
-        <option>Digitalizzazione amministrativa</option>
-      </select>
-      <select id="gradeFilter">
-        <option value="">Tutti i gradi</option>
-        <option>Infanzia</option>
-        <option>Primaria</option>
-        <option>Secondaria di primo grado</option>
-        <option>Tutti i gradi</option>
-        <option>Segreteria</option>
-      </select>
-    </div>
-    <main id="resourceGrid" class="grid"></main>
-  </section>
-
-  <section id="playlistsSection" style="display:none;">
-    <main id="playlistGrid" class="grid"></main>
-  </section>
-
-  <div id="adminPanel" class="admin-panel">
-    <button class="menu-btn" onclick="toggleAdminMenu()">＋</button>
-    <div id="adminMenu" class="admin-menu">
-      <button onclick="openResourceModal()">➕ Nuova Risorsa</button>
-      <button onclick="openPlaylistModal()">➕ Nuovo Minicorso</button>
-    </div>
+<div id="adminPanel" class="admin-panel">
+  <button class="menu-btn" onclick="toggleAdminMenu()">＋</button>
+  <div id="adminMenu" class="admin-menu">
+    <button onclick="openResourceModal()">➕ Nuova Risorsa</button>
   </div>
+</div>
 
-  <div id="loginBox" class="login-box">
-    <input id="adminPass" type="password" placeholder="Password admin" />
-    <button onclick="adminLogin()">Login</button>
+<div id="resourceModal" class="modal">
+  <div class="modal-content">
+    <button class="close-btn" onclick="closeModal('resourceModal')">Chiudi</button>
+    <h2>Nuova Risorsa</h2>
+    <label>Titolo</label><input id="resTitle" type="text">
+    <label>Descrizione</label><textarea id="resDesc"></textarea>
+    <label>Categoria</label><select id="resCategory"><option>Coding</option><option>Intelligenza Artificiale</option></select>
+    <label>Grado</label><select id="resGrade"><option>Infanzia</option><option>Primaria</option><option>Secondaria di primo grado</option></select>
+    <label>Tag</label><input id="resTags" type="text">
+    <label>Tipo</label><select id="resType"><option value="testo">Testo</option><option value="video">Video</option><option value="link">Link</option></select>
+    <label>Contenuto</label><textarea id="resContent"></textarea>
+    <button class="btn" onclick="saveResource()">Salva</button>
   </div>
+</div>
 
-  <!-- Modali -->
-  <div id="resourceModal" class="modal">
-    <div class="modal-content">
-      <h2>Aggiungi Risorsa</h2>
-      <label>Titolo</label><input id="resTitle" type="text">
-      <label>Descrizione</label><textarea id="resDesc"></textarea>
-      <label>Categoria</label>
-      <select id="resCategory">
-        <option>Coding</option><option>Intelligenza Artificiale</option>
-        <option>Stampa 3D</option><option>UdA</option>
-        <option>Storytelling e Multimedia</option>
-        <option>Metodologie didattiche</option>
-        <option>App per l'inclusione</option>
-        <option>Digitalizzazione amministrativa</option>
-      </select>
-      <label>Grado</label>
-      <select id="resGrade">
-        <option>Infanzia</option><option>Primaria</option>
-        <option>Secondaria di primo grado</option>
-        <option>Tutti i gradi</option><option>Segreteria</option>
-      </select>
-      <label>Tag</label><input id="resTags" type="text">
-      <label>Tipo</label>
-      <select id="resType">
-        <option value="testo">Testo</option>
-        <option value="video">Video</option>
-        <option value="link">Link</option>
-      </select>
-      <label>Contenuto</label><textarea id="resContent"></textarea>
-      <button class="btn" onclick="saveResource()">Salva</button>
-      <button class="btn btn-plain" onclick="closeModal('resourceModal')">Annulla</button>
-    </div>
-  </div>
+<script>
+const apiBase = "https://piattaforma-risorse-didattiche.onrender.com/api";
+const $ = id => document.getElementById(id);
+let isAdmin = false;
+let resources = [];
 
-  <script>
-    const apiBase = "https://piattaforma-risorse-didattiche.onrender.com/api";
-    const $ = id => document.getElementById(id);
-    let resources = [], playlists = [], isAdmin = false;
+async function loadResources() {
+  $("loader").style.display = "flex";
+  try {
+    const res = await fetch(apiBase + "/risorse");
+    const data = await res.json();
+    resources = Array.isArray(data) ? data : [];
+    renderResources();
+  } catch (err) {
+    alert("Errore nel caricamento delle risorse. Controlla la console.");
+    console.error("Errore:", err);
+  } finally {
+    $("loader").style.display = "none";
+  }
+}
 
-    async function loadResources(){
-      $("loaderOverlay").classList.remove("hidden");
-      try{
-        const res = await fetch(apiBase + "/risorse");
-        resources = await res.json();
-        renderResources();
-      }catch(e){console.error(e)}
-      $("loaderOverlay").classList.add("hidden");
+async function saveResource() {
+  const payload = {
+    titolo: $("resTitle").value.trim(),
+    descrizione: $("resDesc").value.trim(),
+    categoria: $("resCategory").value.trim(),
+    grado: $("resGrade").value.trim(),
+    tag: $("resTags").value.trim(),
+    tipo: $("resType").value.trim(),
+    contenuto: $("resContent").value.trim()
+  };
+  Object.keys(payload).forEach(k => { if(payload[k] === "") delete payload[k]; });
+
+  try {
+    const res = await fetch(apiBase + "/risorse", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error("Errore backend:", errText);
+      alert("Errore nel salvataggio della risorsa. Controlla la console.");
+      return;
     }
 
-    function renderResources(){
-      const grid = $("resourceGrid");
-      grid.innerHTML = "";
-      const q = $("searchInput").value.toLowerCase();
-      const cat = $("categoryFilter").value;
-      const grade = $("gradeFilter").value;
+    await res.json();
+    closeModal("resourceModal");
+    await loadResources();
+  } catch (err) {
+    console.error("Errore:", err);
+    alert("Errore nel salvataggio della risorsa. Controlla la console.");
+  }
+}
 
-      resources
-        .filter(r => (!cat || r.categoria===cat) && (!grade || r.grado===grade) &&
-          (r.titolo.toLowerCase().includes(q) || r.descrizione.toLowerCase().includes(q) || (r.tag||"").toLowerCase().includes(q)))
-        .forEach((r,i)=>{
-          const card = document.createElement("div");
-          card.className="card";
-          card.innerHTML = `
-            <h3>${r.titolo}</h3>
-            <p>${r.descrizione}</p>
-            <small><b>${r.categoria}</b> | ${r.grado}</small>
-            <button class="btn" onclick="openResource(${i})">Apri Risorsa</button>
-            ${isAdmin ? `
-              <button class="btn btn-plain" onclick="editResource(${i})">Modifica</button>
-              <button class="btn btn-danger" onclick="deleteResource(${i})">Elimina</button>` : ""}
-          `;
-          grid.appendChild(card);
-        });
-    }
+function renderResources() {
+  const grid = $("resourceGrid");
+  grid.innerHTML = "";
+  const cat = $("categoryFilter").value;
+  const grade = $("gradeFilter").value;
+  resources
+    .filter(r => (!cat || r.categoria === cat) && (!grade || r.grado === grade))
+    .forEach(r => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <h3>${r.titolo}</h3>
+        <p>${r.descrizione}</p>
+        <small>${r.categoria} | ${r.grado}</small>
+        <button class="btn" onclick="alert('Apri risorsa: ${r.titolo}')">Apri</button>
+      `;
+      grid.appendChild(card);
+    });
+}
 
-    async function saveResource(){
-      const r = {
-        titolo: $("resTitle").value.trim(),
-        descrizione: $("resDesc").value.trim(),
-        categoria: $("resCategory").value,
-        grado: $("resGrade").value,
-        tag: $("resTags").value,
-        tipo: $("resType").value,
-        contenuto: $("resContent").value
-      };
+function openResourceModal() {
+  $("resourceModal").style.display = "flex";
+  ["resTitle","resDesc","resTags","resContent"].forEach(id => $(id).value = "");
+}
 
-      try{
-        const res = await fetch(apiBase + "/risorse",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(r)});
-        if(!res.ok) throw new Error(await res.text());
-        await loadResources();
-        closeModal("resourceModal");
-        alert("✅ Risorsa salvata con successo!");
-      }catch(e){
-        console.error(e);
-        alert("Errore nel salvataggio della risorsa. Controlla la console.");
-      }
-    }
+function closeModal(id){ $(id).style.display="none"; }
+function toggleAdminMenu(){
+  const menu = $("adminMenu");
+  menu.style.display = menu.style.display==="flex" ? "none" : "flex";
+}
+function adminLogin(){
+  if($("adminPass").value==="admin123"){
+    isAdmin=true;
+    $("loginBox").style.display="none";
+    $("adminPanel").style.display="block";
+  } else alert("Password errata");
+}
 
-    function openResource(i){
-      const r = resources[i];
-      let html = `<h2>${r.titolo}</h2><p>${r.descrizione}</p>`;
-      if(r.tipo==="testo") html += `<div>${r.contenuto}</div>`;
-      if(r.tipo==="video"){
-        let url = r.contenuto;
-        if(url.includes("watch?v=")) url = url.replace("watch?v=","embed/");
-        html += `<iframe width="100%" height="450" src="${url}" allowfullscreen></iframe>`;
-      }
-      if(r.tipo==="link") html += `<a href="${r.contenuto}" target="_blank">Vai alla risorsa</a>`;
-      const view = document.createElement("div");
-      view.className="modal";
-      view.style.display="flex";
-      view.innerHTML=`<div class="modal-content"><button class="close-btn" onclick="this.closest('.modal').remove()">Chiudi</button>${html}</div>`;
-      document.body.appendChild(view);
-    }
+$("categoryFilter").addEventListener("change",renderResources);
+$("gradeFilter").addEventListener("change",renderResources);
 
-    function adminLogin(){
-      if($("adminPass").value.trim()==="admin123"){
-        isAdmin=true;
-        $("adminPanel").style.display="block";
-        $("loginBox").style.display="none";
-        loadResources();
-      } else alert("Password errata");
-    }
-
-    function closeModal(id){$(id).style.display="none"}
-    function openResourceModal(){$("resourceModal").style.display="flex"}
-    function toggleAdminMenu(){
-      const menu=$("adminMenu");
-      menu.style.display = (menu.style.display==="flex")?"none":"flex";
-    }
-
-    $("searchInput").addEventListener("input",renderResources);
-    $("categoryFilter").addEventListener("change",renderResources);
-    $("gradeFilter").addEventListener("change",renderResources);
-
-    window.onload = () => loadResources();
-  </script>
+loadResources();
+</script>
 </body>
 </html>
+
 
 
 
