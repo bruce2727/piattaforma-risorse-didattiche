@@ -11,16 +11,16 @@
     }
     *{box-sizing:border-box}
     body{font-family:Arial,Helvetica,sans-serif;margin:0;background:var(--bg);color:var(--text)}
-    header{background:var(--primary);color:#fff;padding:20px;text-align:center}
+    header{background:var(--primary);color:#fff;padding:20px;text-align:left}
     header h1{margin:0;font-size:22px}
     header h2{margin:5px 0 10px;font-size:16px;font-weight:normal;opacity:0.9}
-    header .search-login{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:10px}
-    header input[type="text"], header input[type="password"]{padding:10px;border:none;border-radius:6px;flex:1 1 220px;max-width:300px}
+    header .search-login{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:10px}
+    header input[type="text"], header input[type="password"]{padding:10px;border:none;border-radius:6px;flex:1 1 220px;max-width:280px}
     header button{background:var(--success);color:#fff;border:none;padding:10px 14px;border-radius:6px;cursor:pointer}
-    nav{background:#eee;padding:10px 20px;display:flex;gap:16px;justify-content:center}
+    nav{background:#eee;padding:10px 20px;display:flex;gap:16px;justify-content:flex-start}
     nav a{font-weight:bold;color:#333;text-decoration:none;cursor:pointer;padding:6px 0;border-bottom:2px solid transparent}
     nav a.active{color:var(--primary);border-color:var(--primary)}
-    .filters{background:#fff;padding:15px;display:flex;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--border);justify-content:center}
+    .filters{background:#fff;padding:15px;display:flex;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--border);justify-content:flex-start}
     .filters select{padding:8px;border:1px solid #ccc;border-radius:4px}
     .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;padding:20px}
     .card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px;display:flex;flex-direction:column;justify-content:space-between;min-height:240px;box-shadow:0 2px 5px rgba(0,0,0,0.1)}
@@ -35,8 +35,20 @@
     .admin-menu{display:none;position:absolute;bottom:60px;right:0;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.2);padding:6px;flex-direction:column;gap:6px}
     .admin-menu button{background:#fff;border:1px solid var(--primary);color:var(--primary);padding:8px;border-radius:6px;cursor:pointer;text-align:left;width:160px}
     .admin-menu button:hover{background:#f0f4ff}
+
+    /* --- MODALI --- */
     .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);justify-content:center;align-items:center;padding:20px;z-index:1200}
-    .modal-content{background:#fff;padding:24px 28px;border-radius:10px;min-width:600px;max-width:800px;width:90%;max-height:90vh;overflow:auto;box-shadow:0 10px 30px rgba(0,0,0,.35);position:relative}
+    .modal-content{
+      background:#fff;padding:24px 28px;border-radius:10px;
+      min-width:700px;max-width:1000px;width:90%;
+      max-height:90vh;overflow:auto;
+      box-shadow:0 10px 30px rgba(0,0,0,.35);position:relative
+    }
+    @media(max-width:700px){
+      .modal-content{min-width:90%;padding:16px}
+      iframe{width:100%!important;height:250px!important}
+    }
+
     .modal-content h2{margin-top:0;color:var(--primary);text-align:center}
     .modal-header{display:flex;justify-content:flex-end;margin-bottom:10px}
     .close-btn{cursor:pointer;border:none;background:#fff;color:var(--primary);border:1px solid var(--primary);border-radius:6px;padding:6px 10px}
@@ -44,6 +56,8 @@
     .modal-content input[type="text"],.modal-content select,.modal-content textarea{width:100%;padding:10px;border:1px solid #ccc;border-radius:6px}
     .modal-content textarea{min-height:90px;resize:vertical}
     .modal-content .btn{width:100%;padding:10px;margin-top:14px;border:none;border-radius:6px;background:var(--success);color:#fff;cursor:pointer;font-size:15px}
+
+    /* --- CORSI --- */
     .course-view{display:none;position:fixed;inset:0;background:#fff;z-index:1150;flex-direction:column}
     .course-header{background:var(--primary);color:#fff;padding:10px 12px;display:flex;justify-content:space-between;align-items:center}
     .course-body{flex:1;display:flex;min-height:0}
@@ -93,6 +107,7 @@
     <main id="playlistGrid" class="grid"></main>
   </section>
 
+  <!-- Admin Panel -->
   <div id="adminPanel" class="admin-panel">
     <button class="menu-btn" onclick="toggleAdminMenu()">＋</button>
     <div id="adminMenu" class="admin-menu">
@@ -101,6 +116,7 @@
     </div>
   </div>
 
+  <!-- Modal Visualizzazione Risorsa -->
   <div id="viewModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -110,6 +126,7 @@
     </div>
   </div>
 
+  <!-- Modal Risorsa -->
   <div id="resourceModal" class="modal">
     <div class="modal-content">
       <h2 id="resourceModalTitle">Aggiungi Risorsa</h2>
@@ -141,6 +158,7 @@
     </div>
   </div>
 
+  <!-- Modal Playlist -->
   <div id="playlistModal" class="modal">
     <div class="modal-content">
       <h2 id="playlistModalTitle">Aggiungi Minicorso</h2>
@@ -159,6 +177,7 @@
     </div>
   </div>
 
+  <!-- Vista corso -->
   <section id="courseView" class="course-view">
     <div class="course-header">
       <span id="courseTitle"></span>
@@ -180,110 +199,111 @@ const $=id=>document.getElementById(id);
 let isAdmin=false,editIndex=null,editPlaylistIndex=null;
 let resources=[],playlists=[];
 
-// --- Avvio forzato su home Risorse ---
+// Forza la home all'avvio
 window.addEventListener("DOMContentLoaded",()=>{
-  $("courseView").style.display="none";
-  $("resourcesSection").style.display="block";
-  $("playlistsSection").style.display="none";
-  $("navResources").classList.add("active");
-  $("navPlaylists").classList.remove("active");
+  showSection('resources');
   loadResources();
   loadPlaylists();
 });
 
-// --- API CALLS ---
-async function loadResources(){const res=await fetch(apiBase+"/risorse");resources=await res.json();renderResources();}
-async function loadPlaylists(){const res=await fetch(apiBase+"/minicorsi");playlists=await res.json();renderPlaylists();}
+// ---- API ----
+async function loadResources(){const r=await fetch(apiBase+"/risorse");resources=await r.json();renderResources();}
+async function loadPlaylists(){const r=await fetch(apiBase+"/minicorsi");playlists=await r.json();renderPlaylists();}
 
-// --- CRUD RISORSE ---
 async function saveResource(){
-  const r={titolo:$("resTitle").value,descrizione:$("resDesc").value,categoria:$("resCategory").value,
-           grado:$("resGrade").value,tag:$("resTags").value,tipo:$("resType").value,contenuto:$("resContent").value};
+  const r={titolo:$("resTitle").value,descrizione:$("resDesc").value,categoria:$("resCategory").value,grado:$("resGrade").value,tag:$("resTags").value,tipo:$("resType").value,contenuto:$("resContent").value};
   let res;
-  if(editIndex!==null)
-    res=await fetch(apiBase+"/risorse/"+resources[editIndex].id,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(r)});
-  else
-    res=await fetch(apiBase+"/risorse",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(r)});
+  if(editIndex!==null){res=await fetch(apiBase+"/risorse/"+resources[editIndex].id,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(r)});}
+  else{res=await fetch(apiBase+"/risorse",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(r)});}
   await res.json();closeModal("resourceModal");loadResources();
 }
-async function deleteResource(i){if(confirm("Eliminare?")){await fetch(apiBase+"/risorse/"+resources[i].id,{method:"DELETE"});loadResources();}}
+async function deleteResource(i){if(confirm("Eliminare?")){await fetch(apiBase+"/risorse/"+resources[i].id,{method:"DELETE"});loadResources()}}
 
-// --- CRUD PLAYLIST ---
 async function savePlaylist(){
   const selected=[...$("resourceCheckboxes").querySelectorAll("input:checked")].map(c=>parseInt(c.value));
   const p={titolo:$("playlistTitleInput").value,descrizione:$("playlistDescInput").value,categoria:$("playlistCategory").value,risorse:JSON.stringify(selected)};
   let res;
-  if(editPlaylistIndex!==null)
-    res=await fetch(apiBase+"/minicorsi/"+playlists[editPlaylistIndex].id,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});
-  else
-    res=await fetch(apiBase+"/minicorsi",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});
+  if(editPlaylistIndex!==null){res=await fetch(apiBase+"/minicorsi/"+playlists[editPlaylistIndex].id,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});}
+  else{res=await fetch(apiBase+"/minicorsi",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});}
   await res.json();closeModal("playlistModal");loadPlaylists();
 }
-async function deletePlaylist(i){if(confirm("Eliminare?")){await fetch(apiBase+"/minicorsi/"+playlists[i].id,{method:"DELETE"});loadPlaylists();}}
+async function deletePlaylist(i){if(confirm("Eliminare?")){await fetch(apiBase+"/minicorsi/"+playlists[i].id,{method:"DELETE"});loadPlaylists()}}
 
-// --- RENDER ---
+// ---- UI ----
 function renderResources(){
   const grid=$("resourceGrid");grid.innerHTML="";
-  const q=$("searchInput").value.toLowerCase();const cat=$("categoryFilter").value;const grade=$("gradeFilter").value;
+  const q=$("searchInput").value.toLowerCase(),cat=$("categoryFilter").value,grade=$("gradeFilter").value;
   resources.filter(r=>(!cat||r.categoria===cat)&&(!grade||r.grado===grade)&&(r.titolo.toLowerCase().includes(q)||r.descrizione.toLowerCase().includes(q)||(r.tag||"").toLowerCase().includes(q)))
-  .forEach((r,i)=>{const card=document.createElement("div");card.className="card";
+  .forEach((r,i)=>{
+    const card=document.createElement("div");card.className="card";
     card.innerHTML=`<h3>${r.titolo}</h3><p>${r.descrizione}</p><small><b>${r.categoria}</b> | ${r.grado}</small>
     <button class="btn" onclick="openResource(${i},false)">Apri Risorsa</button>
     ${isAdmin?`<button class="btn btn-plain" onclick="editResource(${i})">Modifica</button><button class="btn btn-danger" onclick="deleteResource(${i})">Elimina</button>`:""}`;
-    grid.appendChild(card);});
+    grid.appendChild(card);
+  });
 }
 
 function renderPlaylists(){
   const grid=$("playlistGrid");grid.innerHTML="";
   playlists.forEach((p,i)=>{
-    const risorse = Array.isArray(p.risorse) ? p.risorse : JSON.parse(p.risorse || "[]");
+    const risorse=Array.isArray(p.risorse)?p.risorse:JSON.parse(p.risorse||"[]");
     const card=document.createElement("div");card.className="card";
     card.innerHTML=`<h3>${p.titolo}</h3><p>${p.descrizione}</p><small>${p.categoria} | ${risorse.length} risorse</small>
     <button class="btn" onclick="openCourseView(${i})">Apri Minicorso</button>
     ${isAdmin?`<button class="btn btn-plain" onclick="editPlaylist(${i})">Modifica</button><button class="btn btn-danger" onclick="deletePlaylist(${i})">Elimina</button>`:""}`;
-    grid.appendChild(card)});
+    grid.appendChild(card);
+  });
 }
 
-// --- VIEW ---
+// ---- VIEW RISORSA ----
 function openResource(i,fromCourse){
-  const r=resources[i];let html=`<h2>${r.titolo}</h2><p>${r.descrizione}</p>`;
-  if(r.tipo==="testo"){html+=`<div>${r.contenuto}</div>`}
-  if(r.tipo==="video"){let url=r.contenuto;if(url.includes("watch?v="))url=url.replace("watch?v=","embed/");if(url.includes("vimeo.com/")&&!url.includes("player.")){url="https://player.vimeo.com/video/"+url.split("/").pop()}html+=`<iframe width="100%" height="450" src="${url}" allowfullscreen></iframe>`}
-  if(r.tipo==="link"){html+=`<a href="${r.contenuto}" target="_blank">Vai alla risorsa</a>`}
-  if(fromCourse){$("courseContent").innerHTML=html}else{$("viewContent").innerHTML=html;$("viewModal").style.display="flex"}
+  const r=resources[i];
+  let html=`<h2>${r.titolo}</h2><p>${r.descrizione}</p>`;
+  if(r.tipo==="video"){html+=`<div style="position:relative;padding-bottom:56.25%;height:0;"><iframe src="${r.contenuto}" frameborder="0" allowfullscreen style="position:absolute;width:100%;height:100%;top:0;left:0;"></iframe></div>`;}
+  else if(r.tipo==="link"){html+=`<a href="${r.contenuto}" target="_blank">${r.contenuto}</a>`;}
+  else{html+=`<p>${r.contenuto}</p>`;}
+  $("viewContent").innerHTML=html;
+  $("viewModal").style.display="flex";
+}
+function closeModal(id){$(id).style.display="none";}
+
+// ---- ADMIN ----
+function adminLogin(){if($("adminPass").value==="admin123"){isAdmin=true;$("adminPanel").style.display="block";$("adminPass").value="";alert("Accesso admin riuscito");}}
+function toggleAdminMenu(){const m=$("adminMenu");m.style.display=m.style.display==="flex"?"none":"flex";}
+function openResourceModal(){editIndex=null;$("resourceModalTitle").innerText="Aggiungi Risorsa";$("resourceModal").style.display="flex";}
+function openPlaylistModal(){editPlaylistIndex=null;$("playlistModalTitle").innerText="Aggiungi Minicorso";$("playlistModal").style.display="flex";populateResourceCheckboxes();}
+function populateResourceCheckboxes(){const c=$("resourceCheckboxes");c.innerHTML="";resources.forEach((r,i)=>{c.innerHTML+=`<label><input type="checkbox" value="${r.id}"> ${r.titolo}</label><br>`});}
+
+// ---- NAVIGAZIONE ----
+function showSection(s){
+  $("resourcesSection").style.display=s==="resources"?"block":"none";
+  $("playlistsSection").style.display=s==="playlists"?"block":"none";
+  $("navResources").classList.toggle("active",s==="resources");
+  $("navPlaylists").classList.toggle("active",s==="playlists");
 }
 
-// --- COURSE VIEW ---
+// ---- CORSI ----
 function openCourseView(i){
-  const p=playlists[i];
-  const risorse = Array.isArray(p.risorse)?p.risorse:JSON.parse(p.risorse||"[]");
-  $("courseTitle").textContent=p.titolo;
-  $("lessonList").innerHTML="";
-  risorse.forEach((id)=>{const r=resources.find(x=>x.id===id);if(r){const d=document.createElement("div");d.className="lesson";d.textContent=r.titolo;d.onclick=()=>{document.querySelectorAll(".lesson").forEach(x=>x.classList.remove("active"));d.classList.add("active");openResource(resources.indexOf(r),true);d.classList.add("completed");updateProgress(i)};$("lessonList").appendChild(d)}});updateProgress(i);$("courseView").style.display="flex";
+  const c=playlists[i];$("courseView").style.display="flex";$("courseTitle").textContent=c.titolo;
+  const lessons=Array.isArray(c.risorse)?c.risorse:JSON.parse(c.risorse||"[]");
+  const list=$("lessonList");list.innerHTML="";
+  lessons.forEach((id,idx)=>{
+    const r=resources.find(x=>x.id===id);
+    if(r){const div=document.createElement("div");div.className="lesson";div.textContent=r.titolo;
+      div.onclick=()=>{document.querySelectorAll(".lesson").forEach(l=>l.classList.remove("active"));div.classList.add("active");openResource(resources.indexOf(r),true);}
+      list.appendChild(div);}
+  });
 }
-function updateProgress(i){
-  const p=playlists[i];
-  const risorse = Array.isArray(p.risorse)?p.risorse:JSON.parse(p.risorse||"[]");
-  const done=$("lessonList").querySelectorAll(".lesson.completed").length;
-  $("courseProgress").innerText=`Progresso: ${done}/${risorse.length}`;
+function closeCourseView(){$("courseView").style.display="none";}
+function updateContentHint(){
+  const type=$("resType").value;
+  $("contentHint").innerHTML= type==="video" ? "Inserisci l’URL di YouTube o Vimeo (es: https://www.youtube.com/embed/...)" :
+  type==="link" ? "Inserisci un link completo (es: https://...)" : "Inserisci testo o descrizione della risorsa.";
 }
-function closeCourseView(){$("courseView").style.display="none";showSection('resources');}
-
-// --- MODALI ---
-function closeModal(id){$(id).style.display="none"}
-function showSection(s){$("resourcesSection").style.display=s==="resources"?"block":"none";$("playlistsSection").style.display=s==="playlists"?"block":"none";$("navResources").classList.toggle("active",s==="resources");$("navPlaylists").classList.toggle("active",s==="playlists");if(s==="resources")loadResources();else loadPlaylists();}
-function adminLogin(){if($("adminPass").value.trim()==="admin123"){isAdmin=true;$("adminPanel").style.display="block";$("adminPass").style.display="none";loadResources();loadPlaylists();alert("Login riuscito!");}else alert("Password errata");}
-function updateContentHint(){const type=$("resType").value;let hint="";if(type==="video")hint="Incolla un link da YouTube o Vimeo.";else if(type==="testo")hint="Scrivi o incolla testo o UdA.";else if(type==="link")hint="Aggiungi link a risorse esterne.";$("contentHint").textContent=hint;}
-function openResourceModal(edit=false){$("resourceModal").style.display="flex";if(edit){const r=resources[editIndex];$("resTitle").value=r.titolo;$("resDesc").value=r.descrizione;$("resCategory").value=r.categoria;$("resGrade").value=r.grado;$("resTags").value=r.tag;$("resType").value=r.tipo;$("resContent").value=r.contenuto;}else{$("resTitle").value="";$("resDesc").value="";$("resCategory").value="Coding";$("resGrade").value="Primaria";$("resTags").value="";$("resType").value="testo";$("resContent").value="";editIndex=null;}updateContentHint();}
-function editResource(i){editIndex=i;openResourceModal(true);}
-function openPlaylistModal(edit=false){$("playlistModal").style.display="flex";populateResourceCheckboxes();if(edit){const p=playlists[editPlaylistIndex];const risorse=Array.isArray(p.risorse)?p.risorse:JSON.parse(p.risorse||"[]");$("playlistTitleInput").value=p.titolo;$("playlistDescInput").value=p.descrizione;$("playlistCategory").value=p.categoria;filterResourcesByCategory();risorse.forEach(id=>{$("resourceCheckboxes").querySelector(`input[value="${id}"]`).checked=true;});}else{$("playlistTitleInput").value="";$("playlistDescInput").value="";$("playlistCategory").value="Coding";editPlaylistIndex=null;filterResourcesByCategory();}}
-function editPlaylist(i){editPlaylistIndex=i;openPlaylistModal(true);}
-function populateResourceCheckboxes(){const c=$("resourceCheckboxes");c.innerHTML="";resources.forEach((r)=>{c.innerHTML+=`<label><input type="checkbox" value="${r.id}"> ${r.titolo} (${r.categoria})</label><br>`;});}
-function filterResourcesByCategory(){const selectedCat=$("playlistCategory").value;const c=$("resourceCheckboxes");c.innerHTML="";resources.filter(r=>r.categoria===selectedCat).forEach((r)=>{c.innerHTML+=`<label><input type="checkbox" value="${r.id}"> ${r.titolo}</label><br>`;});}
-function toggleAdminMenu(){const menu=$("adminMenu");menu.style.display=(menu.style.display==="flex")?"none":"flex";}
 </script>
 </body>
 </html>
+
 
 
 
