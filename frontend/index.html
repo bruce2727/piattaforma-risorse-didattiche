@@ -21,6 +21,7 @@
       background: var(--bg);
       color: var(--text);
     }
+
     header {
       background: var(--primary);
       color: #fff;
@@ -272,7 +273,6 @@
     <main id="playlistGrid" class="grid"></main>
   </section>
 
-  <!-- pannello admin -->
   <div id="adminPanel" class="admin-panel">
     <button class="menu-btn" onclick="toggleAdminMenu()">＋</button>
     <div id="adminMenu" class="admin-menu">
@@ -281,90 +281,134 @@
     </div>
   </div>
 
-  <!-- modali -->
-  <div id="viewModal" class="modal"><div id="viewModalContent" class="modal-content"></div></div>
-  <div id="resourceModal" class="modal"><div class="modal-content" id="resourceContent"></div></div>
-  <div id="playlistModal" class="modal"><div class="modal-content" id="playlistContent"></div></div>
+  <!-- Modali -->
+  <div id="viewModal" class="modal">
+    <div id="viewModalContent" class="modal-content">
+      <div class="modal-header"><button class="close-btn" onclick="closeViewModal()">Chiudi</button></div>
+      <div id="viewContent"></div>
+    </div>
+  </div>
+
+  <div id="resourceModal" class="modal">
+    <div class="modal-content">
+      <h2>Aggiungi / Modifica Risorsa</h2>
+      <label>Titolo</label><input id="resTitle" type="text">
+      <label>Descrizione</label><textarea id="resDesc"></textarea>
+      <label>Categoria</label><select id="resCategory">
+        <option>Coding</option><option>Intelligenza Artificiale</option><option>Stampa 3D</option>
+        <option>UdA</option><option>Storytelling e Multimedia</option><option>Metodologie didattiche</option>
+        <option>App per l'inclusione</option><option>Digitalizzazione amministrativa</option>
+      </select>
+      <label>Grado</label><select id="resGrade">
+        <option>Infanzia</option><option>Primaria</option><option>Secondaria di primo grado</option>
+        <option>Tutti i gradi</option><option>Segreteria</option>
+      </select>
+      <label>Tag</label><input id="resTags" type="text">
+      <label>Tipo</label><select id="resType">
+        <option value="testo">Testo</option><option value="video">Video</option><option value="link">Link</option>
+      </select>
+      <label>Contenuto</label><textarea id="resContent"></textarea>
+      <button class="btn" onclick="saveResource()">Salva</button>
+      <button class="btn btn-plain" onclick="closeModal('resourceModal')">Annulla</button>
+    </div>
+  </div>
+
+  <div id="playlistModal" class="modal">
+    <div class="modal-content">
+      <h2>Aggiungi / Modifica Minicorso</h2>
+      <label>Titolo</label><input id="playlistTitle" type="text">
+      <label>Descrizione</label><textarea id="playlistDesc"></textarea>
+      <label>Categoria</label><select id="playlistCategory"></select>
+      <div id="resourceCheckboxes"></div>
+      <button class="btn" onclick="savePlaylist()">Salva</button>
+      <button class="btn btn-plain" onclick="closeModal('playlistModal')">Annulla</button>
+    </div>
+  </div>
 
 <script>
 const apiBase = "https://piattaforma-risorse-didattiche.onrender.com/api";
 const $ = id => document.getElementById(id);
-let isAdmin = false, resources = [], playlists = [], editIndex = null;
+let isAdmin=false,editIndex=null,editPlaylistIndex=null,resources=[],playlists=[];
 
-async function loadResources() {
-  const res = await fetch(apiBase + "/risorse");
-  resources = await res.json();
-  renderResources();
-}
-async function loadPlaylists() {
-  const res = await fetch(apiBase + "/minicorsi");
-  playlists = await res.json();
-  renderPlaylists();
-}
-function renderResources() {
-  const grid = $("resourceGrid");
-  grid.innerHTML = "";
-  const q = $("searchInput").value.toLowerCase();
-  const cat = $("categoryFilter").value;
-  const grade = $("gradeFilter").value;
-  resources.filter(r =>
-    (!cat || r.categoria === cat) &&
-    (!grade || r.grado === grade) &&
-    (r.titolo.toLowerCase().includes(q) || r.descrizione.toLowerCase().includes(q))
-  ).forEach((r,i)=>{
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `<h3>${r.titolo}</h3><p>${r.descrizione}</p>
-    <small><b>${r.categoria}</b> | ${r.grado}</small>
-    <button class='btn' onclick='openResource(${i})'>Apri Risorsa</button>
-    ${isAdmin?`<button class='btn btn-plain' onclick='editResource(${i})'>Modifica</button>
-    <button class='btn btn-danger' onclick='deleteResource(${i})'>Elimina</button>`:''}`;
-    grid.appendChild(card);
-  });
-}
-function renderPlaylists() {
-  const grid = $("playlistGrid");
-  grid.innerHTML = "";
-  playlists.forEach((p,i)=>{
-    const risorse = JSON.parse(p.risorse || "[]");
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `<h3>${p.titolo}</h3><p>${p.descrizione}</p>
-    <small>${p.categoria} | ${risorse.length} risorse</small>
-    <button class='btn' onclick='openCourseView(${i})'>Apri Minicorso</button>`;
-    grid.appendChild(card);
-  });
-}
-function showSection(s){
-  $("resourcesSection").style.display = s === "resources" ? "block" : "none";
-  $("playlistsSection").style.display = s === "playlists" ? "block" : "none";
-  $("navResources").classList.toggle("active", s === "resources");
-  $("navPlaylists").classList.toggle("active", s === "playlists");
-  if (s === "resources") loadResources(); else loadPlaylists();
-}
-function adminLogin(){
-  if ($("adminPass").value.trim() === "admin123"){
-    isAdmin = true;
-    $("adminPanel").style.display = "block";
-    $("loginBox").style.display = "none";
-    loadResources(); loadPlaylists();
-  } else alert("Password errata");
-}
-function toggleAdminMenu(){
-  const m = $("adminMenu");
-  m.style.display = m.style.display === "flex" ? "none" : "flex";
-}
+// --- API ---
+async function loadResources(){const res=await fetch(apiBase+"/risorse");resources=await res.json();renderResources();}
+async function loadPlaylists(){const res=await fetch(apiBase+"/minicorsi");playlists=await res.json();renderPlaylists();}
 
-$("searchInput").addEventListener("input", renderResources);
-$("categoryFilter").addEventListener("change", renderResources);
-$("gradeFilter").addEventListener("change", renderResources);
-window.addEventListener("DOMContentLoaded", ()=>{
-  loadResources();
-  showSection("resources");
-});
+// --- CRUD Risorse ---
+async function saveResource(){
+ const r={ titolo:$("resTitle").value,descrizione:$("resDesc").value,categoria:$("resCategory").value,
+  grado:$("resGrade").value,tag:$("resTags").value,tipo:$("resType").value,contenuto:$("resContent").value };
+ const url=editIndex!==null?`${apiBase}/risorse/${resources[editIndex].id}`:`${apiBase}/risorse`;
+ const method=editIndex!==null?"PUT":"POST";
+ await fetch(url,{method,headers:{"Content-Type":"application/json"},body:JSON.stringify(r)});
+ closeModal("resourceModal");loadResources();
+}
+async function deleteResource(i){if(confirm("Eliminare?")){await fetch(apiBase+"/risorse/"+resources[i].id,{method:"DELETE"});loadResources();}}
+function openResourceModal(edit=false){
+ $("resourceModal").style.display="flex";
+ if(edit){const r=resources[editIndex];$("resTitle").value=r.titolo;$("resDesc").value=r.descrizione;$("resCategory").value=r.categoria;$("resGrade").value=r.grado;$("resTags").value=r.tag;$("resType").value=r.tipo;$("resContent").value=r.contenuto;}
+ else{$("resTitle").value="";$("resDesc").value="";$("resCategory").value="Coding";$("resGrade").value="Primaria";$("resTags").value="";$("resType").value="testo";$("resContent").value="";editIndex=null;}
+}
+function editResource(i){editIndex=i;openResourceModal(true);}
+
+// --- CRUD Minicorsi ---
+async function savePlaylist(){
+ const selected=[...document.querySelectorAll("#resourceCheckboxes input:checked")].map(c=>parseInt(c.value));
+ const p={ titolo:$("playlistTitle").value,descrizione:$("playlistDesc").value,categoria:$("playlistCategory").value,risorse:JSON.stringify(selected) };
+ const url=editPlaylistIndex!==null?`${apiBase}/minicorsi/${playlists[editPlaylistIndex].id}`:`${apiBase}/minicorsi`;
+ const method=editPlaylistIndex!==null?"PUT":"POST";
+ await fetch(url,{method,headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});
+ closeModal("playlistModal");loadPlaylists();
+}
+async function deletePlaylist(i){if(confirm("Eliminare?")){await fetch(apiBase+"/minicorsi/"+playlists[i].id,{method:"DELETE"});loadPlaylists();}}
+
+// --- View Risorsa / Minicorso ---
+function openResource(i){
+ const r=resources[i];
+ let html=`<h2>${r.titolo}</h2><p>${r.descrizione}</p>`;
+ if(r.tipo==="testo") html+=`<div>${r.contenuto}</div>`;
+ if(r.tipo==="video"){let url=r.contenuto;if(url.includes("watch?v="))url=url.replace("watch?v=","embed/");html+=`<iframe width="100%" height="450" src="${url}" allowfullscreen></iframe>`;}
+ if(r.tipo==="link") html+=`<a href="${r.contenuto}" target="_blank">Vai alla risorsa</a>`;
+ $("viewContent").innerHTML=html;$("viewModal").style.display="flex";
+}
+function closeViewModal(){$("viewModal").style.display="none";}
+
+// --- UI ---
+function renderResources(){
+ const grid=$("resourceGrid");grid.innerHTML="";
+ const q=$("searchInput").value.toLowerCase(),cat=$("categoryFilter").value,grade=$("gradeFilter").value;
+ resources.filter(r=>(!cat||r.categoria===cat)&&(!grade||r.grado===grade)&&(r.titolo.toLowerCase().includes(q)||r.descrizione.toLowerCase().includes(q)||(r.tag||"").toLowerCase().includes(q)))
+ .forEach((r,i)=>{const card=document.createElement("div");card.className="card";
+ card.innerHTML=`<h3>${r.titolo}</h3><p>${r.descrizione}</p><small><b>${r.categoria}</b> | ${r.grado}</small>
+ <button class='btn' onclick='openResource(${i})'>Apri Risorsa</button>${isAdmin?`<button class='btn btn-plain' onclick='editResource(${i})'>Modifica</button><button class='btn btn-danger' onclick='deleteResource(${i})'>Elimina</button>`:""}`;grid.appendChild(card);});
+}
+function renderPlaylists(){
+ const grid=$("playlistGrid");grid.innerHTML="";
+ playlists.forEach((p,i)=>{const risorse=Array.isArray(p.risorse)?p.risorse:JSON.parse(p.risorse||"[]");
+ const card=document.createElement("div");card.className="card";
+ card.innerHTML=`<h3>${p.titolo}</h3><p>${p.descrizione}</p><small>${p.categoria} | ${risorse.length} risorse</small>
+ <button class='btn' onclick='openCourseView(${i})'>Apri Minicorso</button>${isAdmin?`<button class='btn btn-plain' onclick='editPlaylist(${i})'>Modifica</button><button class='btn btn-danger' onclick='deletePlaylist(${i})'>Elimina</button>`:""}`;grid.appendChild(card);});
+}
+function openCourseView(i){
+ const p=playlists[i];const risorse=Array.isArray(p.risorse)?p.risorse:JSON.parse(p.risorse||"[]");
+ let html=`<h2>${p.titolo}</h2><p>${p.descrizione}</p><ul>`;
+ risorse.forEach(id=>{const r=resources.find(x=>x.id===id);if(r)html+=`<li><a href='#' onclick='openResource(${resources.indexOf(r)})'>${r.titolo}</a></li>`;});
+ html+="</ul>";$("viewContent").innerHTML=html;$("viewModal").style.display="flex";
+}
+function openPlaylistModal(edit=false){
+ $("playlistModal").style.display="flex";$("playlistCategory").innerHTML=[...new Set(resources.map(r=>r.categoria))].map(c=>`<option>${c}</option>`).join("");
+ $("resourceCheckboxes").innerHTML=resources.map(r=>`<label><input type='checkbox' value='${r.id}'>${r.titolo}</label>`).join("<br>");
+}
+function closeModal(id){$(id).style.display="none";}
+function toggleAdminMenu(){const m=$("adminMenu");m.style.display=m.style.display==="flex"?"none":"flex";}
+function adminLogin(){if($("adminPass").value==="admin123"){isAdmin=true;$("adminPanel").style.display="block";$("loginBox").style.display="none";loadResources();loadPlaylists();}else alert("Password errata");}
+function showSection(s){$("resourcesSection").style.display=s==="resources"?"block":"none";$("playlistsSection").style.display=s==="playlists"?"block":"none";$("navResources").classList.toggle("active",s==="resources");$("navPlaylists").classList.toggle("active",s==="playlists");if(s==="resources")loadResources();else loadPlaylists();}
+$("searchInput").addEventListener("input",renderResources);$("categoryFilter").addEventListener("change",renderResources);$("gradeFilter").addEventListener("change",renderResources);
+window.addEventListener("DOMContentLoaded",()=>{loadResources();showSection("resources");});
 </script>
 </body>
 </html>
+
 
 
 
