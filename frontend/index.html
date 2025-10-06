@@ -1,197 +1,121 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <title>Piattaforma Risorse Didattiche</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    :root{
-      --primary:#4a90e2; --success:#28a745; --danger:#dc3545;
-      --bg:#f9f9f9; --text:#333; --muted:#555; --border:#ddd;
-    }
-    *{box-sizing:border-box}
-    body{font-family:Arial,Helvetica,sans-serif;margin:0;background:var(--bg);color:var(--text)}
-    header{background:var(--primary);color:#fff;padding:20px;text-align:left}
-    header h1{margin:0;font-size:22px}
-    header h2{margin:5px 0 10px;font-size:16px;font-weight:normal;opacity:0.9}
-    header .search-login{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:10px}
-    header input[type="text"], header input[type="password"]{padding:10px;border:none;border-radius:6px;flex:1 1 220px;max-width:280px}
-    header button{background:var(--success);color:#fff;border:none;padding:10px 14px;border-radius:6px;cursor:pointer}
-    nav{background:#eee;padding:10px 20px;display:flex;gap:16px;justify-content:flex-start}
-    nav a{font-weight:bold;color:#333;text-decoration:none;cursor:pointer;padding:6px 0;border-bottom:2px solid transparent}
-    nav a.active{color:var(--primary);border-color:var(--primary)}
-    .filters{background:#fff;padding:15px;display:flex;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--border);justify-content:flex-start}
-    .filters select{padding:8px;border:1px solid #ccc;border-radius:4px}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;padding:20px}
-    .card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px;display:flex;flex-direction:column;justify-content:space-between;min-height:240px;box-shadow:0 2px 5px rgba(0,0,0,0.1)}
-    .card h3{margin:0 0 4px 0;font-size:18px}
-    .card p{margin:0 0 8px 0;color:var(--muted);font-size:14px;flex-grow:1}
-    .card .btn{width:100%;margin-top:auto;padding:9px 10px;border:none;border-radius:4px;background:var(--primary);color:#fff;cursor:pointer}
-    .card .btn + .btn{margin-top:6px}
-    .btn-danger{background:var(--danger)!important}
-    .btn-plain{background:#fff;border:1px solid var(--primary);color:var(--primary)}
-    .admin-panel{position:fixed;bottom:20px;right:20px;display:none;z-index:1100}
-    .admin-panel .menu-btn{background:var(--success);color:#fff;border:none;padding:12px 16px;border-radius:50%;font-size:20px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15)}
-    .admin-menu{display:none;position:absolute;bottom:60px;right:0;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.2);padding:6px;flex-direction:column;gap:6px}
-    .admin-menu button{background:#fff;border:1px solid var(--primary);color:var(--primary);padding:8px;border-radius:6px;cursor:pointer;text-align:left;width:160px}
-    .admin-menu button:hover{background:#f0f4ff}
-
-    /* --- MODALI --- */
-    .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);justify-content:center;align-items:center;padding:20px;z-index:1200}
-    .modal-content{
-      background:#fff;padding:24px 28px;border-radius:10px;
-      min-width:700px;max-width:1000px;width:90%;
-      max-height:90vh;overflow:auto;
-      box-shadow:0 10px 30px rgba(0,0,0,.35);position:relative
-    }
-    @media(max-width:700px){
-      .modal-content{min-width:90%;padding:16px}
-      iframe{width:100%!important;height:250px!important}
-    }
-
-    .modal-content h2{margin-top:0;color:var(--primary);text-align:center}
-    .modal-header{display:flex;justify-content:flex-end;margin-bottom:10px}
-    .close-btn{cursor:pointer;border:none;background:#fff;color:var(--primary);border:1px solid var(--primary);border-radius:6px;padding:6px 10px}
-    .modal-content label{display:block;font-weight:bold;margin-top:12px;margin-bottom:4px}
-    .modal-content input[type="text"],.modal-content select,.modal-content textarea{width:100%;padding:10px;border:1px solid #ccc;border-radius:6px}
-    .modal-content textarea{min-height:90px;resize:vertical}
-    .modal-content .btn{width:100%;padding:10px;margin-top:14px;border:none;border-radius:6px;background:var(--success);color:#fff;cursor:pointer;font-size:15px}
-
-    /* --- CORSI --- */
-    .course-view{display:none;position:fixed;inset:0;background:#fff;z-index:1150;flex-direction:column}
-    .course-header{background:var(--primary);color:#fff;padding:10px 12px;display:flex;justify-content:space-between;align-items:center}
-    .course-body{flex:1;display:flex;min-height:0}
-    .course-sidebar{width:280px;border-right:1px solid var(--border);padding:12px;overflow:auto;background:#f7f7f7}
-    .lesson{cursor:pointer;padding:8px;border-radius:6px;margin-bottom:6px;background:#fff;border:1px solid #eee}
-    .lesson:hover{background:#f0f4ff}
-    .lesson.active{background:#dceaff;border-color:#aac7ff}
-    .lesson.completed{background:#e8f6ec;border-color:#cdebd8}
-    .course-content{flex:1;padding:14px;overflow:auto}
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Piattaforma Risorse Didattiche</title>
+<style>
+:root{
+  --primary:#4a90e2; --success:#28a745; --danger:#dc3545;
+  --bg:#f9f9f9; --text:#333; --muted:#555; --border:#ddd;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);}
+header{background:var(--primary);color:#fff;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;}
+header h1{margin:0;font-size:20px;text-align:left;flex:1 1 60%;}
+header h2{font-size:14px;font-weight:normal;margin-top:4px;}
+.search-wrap{flex:1 1 200px;min-width:180px;}
+.search-wrap input{width:100%;padding:8px;border:none;border-radius:4px;}
+.login-box{display:flex;gap:8px;}
+.login-box input{padding:6px;border:1px solid #ccc;border-radius:6px;}
+.login-box button{padding:6px 10px;border:none;border-radius:6px;background:#fff;color:var(--primary);cursor:pointer;font-weight:bold;}
+nav{background:#eee;padding:10px 20px;display:flex;gap:16px;}
+nav a{font-weight:bold;color:#333;text-decoration:none;cursor:pointer;padding:6px 0;border-bottom:2px solid transparent;}
+nav a.active{color:var(--primary);border-color:var(--primary);}
+.filters{background:#fff;padding:15px;display:flex;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--border);}
+.filters select{padding:8px;border:1px solid #ccc;border-radius:4px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;padding:20px;}
+.card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px;display:flex;flex-direction:column;justify-content:space-between;}
+.card h3{margin-bottom:4px;font-size:18px;}
+.card p{color:var(--muted);font-size:14px;margin-bottom:8px;flex:1;}
+.card .btn{width:100%;padding:9px;border:none;border-radius:4px;background:var(--primary);color:#fff;margin-top:6px;cursor:pointer;}
+.btn-danger{background:var(--danger);}
+.btn-plain{background:#fff;border:1px solid var(--primary);color:var(--primary);}
+.admin-panel{position:fixed;bottom:20px;right:20px;display:none;z-index:1100;}
+.admin-panel .menu-btn{background:var(--success);color:#fff;border:none;padding:12px 16px;border-radius:50%;font-size:20px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);}
+.admin-menu{display:none;position:absolute;bottom:60px;right:0;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.2);padding:6px;flex-direction:column;gap:6px;}
+.admin-menu button{background:#fff;border:1px solid var(--primary);color:var(--primary);padding:8px;border-radius:6px;cursor:pointer;text-align:left;width:160px;}
+.admin-menu button:hover{background:#f0f4ff;}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);justify-content:center;align-items:center;padding:20px;z-index:1200;}
+.modal-content{background:#fff;padding:22px;border-radius:10px;width:90%;max-width:900px;max-height:90vh;overflow:auto;box-shadow:0 10px 30px rgba(0,0,0,.35);}
+.modal-content label{display:block;font-weight:bold;margin-top:12px;margin-bottom:4px;}
+.modal-content input[type="text"],.modal-content select,.modal-content textarea{width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;}
+.modal-content textarea{min-height:100px;resize:vertical;}
+.modal-content .btn{width:100%;padding:10px;margin-top:12px;border:none;border-radius:6px;background:var(--success);color:#fff;font-size:15px;cursor:pointer;}
+.close-btn{background:#fff;color:var(--primary);border:1px solid var(--primary);border-radius:6px;padding:6px 10px;cursor:pointer;float:right;}
+.course-view{display:none;position:fixed;inset:0;background:#fff;z-index:1150;flex-direction:column;}
+.course-header{background:var(--primary);color:#fff;padding:10px;display:flex;justify-content:space-between;align-items:center;}
+.course-body{flex:1;display:flex;overflow:hidden;}
+.course-sidebar{width:260px;border-right:1px solid var(--border);padding:12px;overflow:auto;background:#f7f7f7;}
+.lesson{cursor:pointer;padding:8px;border-radius:6px;margin-bottom:6px;background:#fff;border:1px solid #eee;}
+.lesson:hover{background:#f0f4ff;}
+.lesson.active{background:#e8f6ec;border-color:#cdebd8;}
+.course-content{flex:1;padding:14px;overflow:auto;}
+iframe{border:none;}
+@media(max-width:768px){
+  .modal-content{width:95%;max-width:100%;padding:16px;}
+  iframe{width:100%;height:auto;}
+}
+</style>
 </head>
 <body>
-  <header>
+<header>
+  <div>
     <h1>Piattaforma Risorse Didattiche</h1>
     <h2>a cura della Comunità di Pratiche dell'Istituto Comprensivo 3 di Alghero</h2>
-    <div class="search-login">
-      <input id="searchInput" type="text" placeholder="🔍 Cerca per tag o parola chiave..." />
-      <input id="adminPass" type="password" placeholder="Password admin" />
-      <button onclick="adminLogin()">Login</button>
-    </div>
-  </header>
-
-  <nav>
-    <a id="navResources" class="active" onclick="showSection('resources')">Risorse</a>
-    <a id="navPlaylists" onclick="showSection('playlists')">Minicorsi</a>
-  </nav>
-
-  <section id="resourcesSection">
-    <div class="filters">
-      <select id="categoryFilter">
-        <option value="">Tutte le categorie</option>
-        <option>Coding</option><option>Intelligenza Artificiale</option>
-        <option>Stampa 3D</option><option>UdA</option>
-        <option>Storytelling e Multimedia</option><option>Metodologie didattiche</option>
-        <option>App per l'inclusione</option><option>Digitalizzazione amministrativa</option>
-      </select>
-      <select id="gradeFilter">
-        <option value="">Tutti i gradi</option>
-        <option>Infanzia</option><option>Primaria</option>
-        <option>Secondaria di primo grado</option><option>Tutti i gradi</option><option>Segreteria</option>
-      </select>
-    </div>
-    <main id="resourceGrid" class="grid"></main>
-  </section>
-
-  <section id="playlistsSection" style="display:none;">
-    <main id="playlistGrid" class="grid"></main>
-  </section>
-
-  <!-- Admin Panel -->
-  <div id="adminPanel" class="admin-panel">
-    <button class="menu-btn" onclick="toggleAdminMenu()">＋</button>
-    <div id="adminMenu" class="admin-menu">
-      <button onclick="openResourceModal()">➕ Nuova Risorsa</button>
-      <button onclick="openPlaylistModal()">➕ Nuovo Minicorso</button>
-    </div>
   </div>
+  <div class="search-wrap"><input id="searchInput" type="text" placeholder="Cerca per tag o parola chiave..." /></div>
+  <div class="login-box"><input id="adminPass" type="password" placeholder="Password admin" /><button onclick="adminLogin()">Login</button></div>
+</header>
 
-  <!-- Modal Visualizzazione Risorsa -->
-  <div id="viewModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button class="close-btn" onclick="closeModal('viewModal')">Chiudi</button>
-      </div>
-      <div id="viewContent"></div>
-    </div>
+<nav>
+  <a id="navResources" class="active" onclick="showSection('resources')">Risorse</a>
+  <a id="navPlaylists" onclick="showSection('playlists')">Minicorsi</a>
+</nav>
+
+<section id="resourcesSection">
+  <div class="filters">
+    <select id="categoryFilter"><option value="">Tutte le categorie</option><option>Coding</option><option>Intelligenza Artificiale</option><option>Stampa 3D</option><option>UdA</option><option>Storytelling e Multimedia</option><option>Metodologie didattiche</option><option>App per l'inclusione</option><option>Digitalizzazione amministrativa</option></select>
+    <select id="gradeFilter"><option value="">Tutti i gradi</option><option>Infanzia</option><option>Primaria</option><option>Secondaria di primo grado</option><option>Tutti i gradi</option><option>Segreteria</option></select>
   </div>
+  <main id="resourceGrid" class="grid"></main>
+</section>
 
-  <!-- Modal Risorsa -->
-  <div id="resourceModal" class="modal">
-    <div class="modal-content">
-      <h2 id="resourceModalTitle">Aggiungi Risorsa</h2>
-      <label>Titolo</label><input id="resTitle" type="text" />
-      <label>Descrizione</label><textarea id="resDesc"></textarea>
-      <label>Categoria</label>
-      <select id="resCategory">
-        <option>Coding</option><option>Intelligenza Artificiale</option>
-        <option>Stampa 3D</option><option>UdA</option>
-        <option>Storytelling e Multimedia</option><option>Metodologie didattiche</option>
-        <option>App per l'inclusione</option><option>Digitalizzazione amministrativa</option>
-      </select>
-      <label>Grado</label>
-      <select id="resGrade">
-        <option>Infanzia</option><option>Primaria</option>
-        <option>Secondaria di primo grado</option><option>Tutti i gradi</option><option>Segreteria</option>
-      </select>
-      <label>Tag</label><input id="resTags" type="text" />
-      <label>Tipo</label>
-      <select id="resType" onchange="updateContentHint()">
-        <option value="testo">Testo</option>
-        <option value="video">Video</option>
-        <option value="link">Link</option>
-      </select>
-      <label>Contenuto</label><textarea id="resContent"></textarea>
-      <div id="contentHint" style="font-size:13px;color:#555;margin-top:6px"></div>
-      <button class="btn" onclick="saveResource()">Salva</button>
-      <button class="btn btn-plain" onclick="closeModal('resourceModal')">Annulla</button>
-    </div>
+<section id="playlistsSection" style="display:none;"><main id="playlistGrid" class="grid"></main></section>
+
+<!-- Admin Panel -->
+<div id="adminPanel" class="admin-panel">
+  <button class="menu-btn" onclick="toggleAdminMenu()">＋</button>
+  <div id="adminMenu" class="admin-menu">
+    <button onclick="openResourceModal()">➕ Nuova Risorsa</button>
+    <button onclick="openPlaylistModal()">➕ Nuovo Minicorso</button>
   </div>
+</div>
 
-  <!-- Modal Playlist -->
-  <div id="playlistModal" class="modal">
-    <div class="modal-content">
-      <h2 id="playlistModalTitle">Aggiungi Minicorso</h2>
-      <label>Titolo</label><input id="playlistTitleInput" type="text" />
-      <label>Descrizione</label><textarea id="playlistDescInput"></textarea>
-      <label>Categoria</label>
-      <select id="playlistCategory" onchange="filterResourcesByCategory()">
-        <option>Coding</option><option>Intelligenza Artificiale</option>
-        <option>Stampa 3D</option><option>UdA</option>
-        <option>Storytelling e Multimedia</option><option>Metodologie didattiche</option>
-        <option>App per l'inclusione</option><option>Digitalizzazione amministrativa</option>
-      </select>
-      <label>Seleziona risorse</label><div id="resourceCheckboxes"></div>
-      <button class="btn" onclick="savePlaylist()">Salva</button>
-      <button class="btn btn-plain" onclick="closeModal('playlistModal')">Annulla</button>
-    </div>
-  </div>
+<!-- Modale Visualizzazione -->
+<div id="viewModal" class="modal"><div class="modal-content"><button class="close-btn" onclick="closeModal('viewModal')">Chiudi</button><div id="viewContent"></div></div></div>
 
-  <!-- Vista corso -->
-  <section id="courseView" class="course-view">
-    <div class="course-header">
-      <span id="courseTitle"></span>
-      <button class="btn btn-plain" onclick="closeCourseView()">Chiudi</button>
-    </div>
-    <div class="course-body">
-      <aside class="course-sidebar">
-        <h3>Lezioni</h3>
-        <div id="courseProgress"></div>
-        <div id="lessonList"></div>
-      </aside>
-      <main id="courseContent" class="course-content"></main>
-    </div>
-  </section>
+<!-- Modale Risorse -->
+<div id="resourceModal" class="modal"><div class="modal-content"><h2 id="resourceModalTitle">Aggiungi Risorsa</h2>
+<label>Titolo</label><input id="resTitle" type="text" />
+<label>Descrizione</label><textarea id="resDesc"></textarea>
+<label>Categoria</label><select id="resCategory"><option>Coding</option><option>Intelligenza Artificiale</option><option>Stampa 3D</option><option>UdA</option><option>Storytelling e Multimedia</option><option>Metodologie didattiche</option><option>App per l'inclusione</option><option>Digitalizzazione amministrativa</option></select>
+<label>Grado</label><select id="resGrade"><option>Infanzia</option><option>Primaria</option><option>Secondaria di primo grado</option><option>Tutti i gradi</option><option>Segreteria</option></select>
+<label>Tag</label><input id="resTags" type="text" />
+<label>Tipo</label><select id="resType" onchange="updateContentHint()"><option value="testo">Testo</option><option value="video">Video</option><option value="link">Link</option></select>
+<label>Contenuto</label><textarea id="resContent"></textarea><div id="contentHint" style="font-size:13px;color:#555;margin-top:6px"></div>
+<button class="btn" onclick="saveResource()">Salva</button><button class="btn btn-plain" onclick="closeModal('resourceModal')">Annulla</button></div></div>
+
+<!-- Modale Playlist -->
+<div id="playlistModal" class="modal"><div class="modal-content"><h2 id="playlistModalTitle">Aggiungi Minicorso</h2>
+<label>Titolo</label><input id="playlistTitleInput" type="text" />
+<label>Descrizione</label><textarea id="playlistDescInput"></textarea>
+<label>Categoria</label><select id="playlistCategory" onchange="filterResourcesByCategory()"><option>Coding</option><option>Intelligenza Artificiale</option><option>Stampa 3D</option><option>UdA</option><option>Storytelling e Multimedia</option><option>Metodologie didattiche</option><option>App per l'inclusione</option><option>Digitalizzazione amministrativa</option></select>
+<label>Seleziona risorse</label><div id="resourceCheckboxes"></div>
+<button class="btn" onclick="savePlaylist()">Salva</button><button class="btn btn-plain" onclick="closeModal('playlistModal')">Annulla</button></div></div>
+
+<!-- Vista Minicorso -->
+<section id="courseView" class="course-view"><div class="course-header"><span id="courseTitle"></span><button class="btn btn-plain" onclick="closeCourseView()">Chiudi</button></div><div class="course-body"><aside class="course-sidebar"><h3>Lezioni</h3><div id="courseProgress"></div><div id="lessonList"></div></aside><main id="courseContent" class="course-content"></main></div></section>
 
 <script>
 const apiBase="https://piattaforma-risorse-didattiche.onrender.com/api";
@@ -199,17 +123,9 @@ const $=id=>document.getElementById(id);
 let isAdmin=false,editIndex=null,editPlaylistIndex=null;
 let resources=[],playlists=[];
 
-// Forza la home all'avvio
-window.addEventListener("DOMContentLoaded",()=>{
-  showSection('resources');
-  loadResources();
-  loadPlaylists();
-});
-
-// ---- API ----
-async function loadResources(){const r=await fetch(apiBase+"/risorse");resources=await r.json();renderResources();}
-async function loadPlaylists(){const r=await fetch(apiBase+"/minicorsi");playlists=await r.json();renderPlaylists();}
-
+// --- API ---
+async function loadResources(){const res=await fetch(apiBase+"/risorse");resources=await res.json();renderResources();}
+async function loadPlaylists(){const res=await fetch(apiBase+"/minicorsi");playlists=await res.json();renderPlaylists();}
 async function saveResource(){
   const r={titolo:$("resTitle").value,descrizione:$("resDesc").value,categoria:$("resCategory").value,grado:$("resGrade").value,tag:$("resTags").value,tipo:$("resType").value,contenuto:$("resContent").value};
   let res;
@@ -217,8 +133,7 @@ async function saveResource(){
   else{res=await fetch(apiBase+"/risorse",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(r)});}
   await res.json();closeModal("resourceModal");loadResources();
 }
-async function deleteResource(i){if(confirm("Eliminare?")){await fetch(apiBase+"/risorse/"+resources[i].id,{method:"DELETE"});loadResources()}}
-
+async function deleteResource(i){if(confirm("Eliminare?")){await fetch(apiBase+"/risorse/"+resources[i].id,{method:"DELETE"});loadResources();}}
 async function savePlaylist(){
   const selected=[...$("resourceCheckboxes").querySelectorAll("input:checked")].map(c=>parseInt(c.value));
   const p={titolo:$("playlistTitleInput").value,descrizione:$("playlistDescInput").value,categoria:$("playlistCategory").value,risorse:JSON.stringify(selected)};
@@ -227,9 +142,9 @@ async function savePlaylist(){
   else{res=await fetch(apiBase+"/minicorsi",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});}
   await res.json();closeModal("playlistModal");loadPlaylists();
 }
-async function deletePlaylist(i){if(confirm("Eliminare?")){await fetch(apiBase+"/minicorsi/"+playlists[i].id,{method:"DELETE"});loadPlaylists()}}
+async function deletePlaylist(i){if(confirm("Eliminare?")){await fetch(apiBase+"/minicorsi/"+playlists[i].id,{method:"DELETE"});loadPlaylists();}}
 
-// ---- UI ----
+// --- RENDER ---
 function renderResources(){
   const grid=$("resourceGrid");grid.innerHTML="";
   const q=$("searchInput").value.toLowerCase(),cat=$("categoryFilter").value,grade=$("gradeFilter").value;
@@ -237,12 +152,11 @@ function renderResources(){
   .forEach((r,i)=>{
     const card=document.createElement("div");card.className="card";
     card.innerHTML=`<h3>${r.titolo}</h3><p>${r.descrizione}</p><small><b>${r.categoria}</b> | ${r.grado}</small>
-    <button class="btn" onclick="openResource(${i},false)">Apri Risorsa</button>
+    <button class="btn" onclick="openResource(${i})">Apri Risorsa</button>
     ${isAdmin?`<button class="btn btn-plain" onclick="editResource(${i})">Modifica</button><button class="btn btn-danger" onclick="deleteResource(${i})">Elimina</button>`:""}`;
     grid.appendChild(card);
   });
 }
-
 function renderPlaylists(){
   const grid=$("playlistGrid");grid.innerHTML="";
   playlists.forEach((p,i)=>{
@@ -255,54 +169,68 @@ function renderPlaylists(){
   });
 }
 
-// ---- VIEW RISORSA ----
-function openResource(i,fromCourse){
+// --- VIEW ---
+function openResource(i){
   const r=resources[i];
   let html=`<h2>${r.titolo}</h2><p>${r.descrizione}</p>`;
-  if(r.tipo==="video"){html+=`<div style="position:relative;padding-bottom:56.25%;height:0;"><iframe src="${r.contenuto}" frameborder="0" allowfullscreen style="position:absolute;width:100%;height:100%;top:0;left:0;"></iframe></div>`;}
-  else if(r.tipo==="link"){html+=`<a href="${r.contenuto}" target="_blank">${r.contenuto}</a>`;}
-  else{html+=`<p>${r.contenuto}</p>`;}
+  if(r.tipo==="testo"){html+=`<div>${r.contenuto}</div>`;}
+  if(r.tipo==="video"){
+    let url=r.contenuto;
+    if(url.includes("watch?v="))url=url.replace("watch?v=","embed/");
+    if(url.includes("vimeo.com/")&&!url.includes("player.")){url="https://player.vimeo.com/video/"+url.split("/").pop();}
+    html+=`<div style="position:relative;padding-bottom:56.25%;height:0;"><iframe src="${url}" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe></div>`;
+  }
+  if(r.tipo==="link"){html+=`<a href="${r.contenuto}" target="_blank">${r.contenuto}</a>`;}
   $("viewContent").innerHTML=html;
   $("viewModal").style.display="flex";
 }
 function closeModal(id){$(id).style.display="none";}
 
-// ---- ADMIN ----
-function adminLogin(){if($("adminPass").value==="admin123"){isAdmin=true;$("adminPanel").style.display="block";$("adminPass").value="";alert("Accesso admin riuscito");}}
-function toggleAdminMenu(){const m=$("adminMenu");m.style.display=m.style.display==="flex"?"none":"flex";}
-function openResourceModal(){editIndex=null;$("resourceModalTitle").innerText="Aggiungi Risorsa";$("resourceModal").style.display="flex";}
-function openPlaylistModal(){editPlaylistIndex=null;$("playlistModalTitle").innerText="Aggiungi Minicorso";$("playlistModal").style.display="flex";populateResourceCheckboxes();}
-function populateResourceCheckboxes(){const c=$("resourceCheckboxes");c.innerHTML="";resources.forEach((r,i)=>{c.innerHTML+=`<label><input type="checkbox" value="${r.id}"> ${r.titolo}</label><br>`});}
-
-// ---- NAVIGAZIONE ----
-function showSection(s){
-  $("resourcesSection").style.display=s==="resources"?"block":"none";
-  $("playlistsSection").style.display=s==="playlists"?"block":"none";
-  $("navResources").classList.toggle("active",s==="resources");
-  $("navPlaylists").classList.toggle("active",s==="playlists");
+// --- ADMIN ---
+function adminLogin(){if($("adminPass").value.trim()==="admin123"){isAdmin=true;$("adminPanel").style.display="block";alert("Login riuscito!");}else alert("Password errata");}
+function toggleAdminMenu(){const menu=$("adminMenu");menu.style.display=(menu.style.display==="flex")?"none":"flex";}
+function openResourceModal(edit=false){
+  $("resourceModal").style.display="flex";
+  if(edit){const r=resources[editIndex];$("resTitle").value=r.titolo;$("resDesc").value=r.descrizione;$("resCategory").value=r.categoria;$("resGrade").value=r.grado;$("resTags").value=r.tag;$("resType").value=r.tipo;$("resContent").value=r.contenuto;}
+  else{$("resTitle").value="";$("resDesc").value="";$("resCategory").value="Coding";$("resGrade").value="Primaria";$("resTags").value="";$("resType").value="testo";$("resContent").value="";editIndex=null;}
+  updateContentHint();
 }
+function editResource(i){editIndex=i;openResourceModal(true);}
+function openPlaylistModal(edit=false){
+  $("playlistModal").style.display="flex";
+  populateResourceCheckboxes();
+  if(edit){const p=playlists[editPlaylistIndex];const risorse=Array.isArray(p.risorse)?p.risorse:JSON.parse(p.risorse||"[]");$("playlistTitleInput").value=p.titolo;$("playlistDescInput").value=p.descrizione;$("playlistCategory").value=p.categoria;filterResourcesByCategory();risorse.forEach(id=>{$("resourceCheckboxes").querySelector(`input[value="${id}"]`).checked=true;});}
+  else{$("playlistTitleInput").value="";$("playlistDescInput").value="";$("playlistCategory").value="Coding";editPlaylistIndex=null;filterResourcesByCategory();}
+}
+function editPlaylist(i){editPlaylistIndex=i;openPlaylistModal(true);}
+function populateResourceCheckboxes(){const c=$("resourceCheckboxes");c.innerHTML="";resources.forEach(r=>{c.innerHTML+=`<label><input type="checkbox" value="${r.id}"> ${r.titolo}</label><br>`;});}
+function filterResourcesByCategory(){const selectedCat=$("playlistCategory").value;const c=$("resourceCheckboxes");c.innerHTML="";resources.filter(r=>r.categoria===selectedCat).forEach(r=>{c.innerHTML+=`<label><input type="checkbox" value="${r.id}"> ${r.titolo}</label><br>`;});}
 
-// ---- CORSI ----
+// --- COURSE VIEW ---
 function openCourseView(i){
-  const c=playlists[i];$("courseView").style.display="flex";$("courseTitle").textContent=c.titolo;
-  const lessons=Array.isArray(c.risorse)?c.risorse:JSON.parse(c.risorse||"[]");
-  const list=$("lessonList");list.innerHTML="";
-  lessons.forEach((id,idx)=>{
-    const r=resources.find(x=>x.id===id);
-    if(r){const div=document.createElement("div");div.className="lesson";div.textContent=r.titolo;
-      div.onclick=()=>{document.querySelectorAll(".lesson").forEach(l=>l.classList.remove("active"));div.classList.add("active");openResource(resources.indexOf(r),true);}
-      list.appendChild(div);}
-  });
+  const p=playlists[i];$("courseTitle").textContent=p.titolo;
+  const risorse=Array.isArray(p.risorse)?p.risorse:JSON.parse(p.risorse||"[]");
+  $("lessonList").innerHTML="";
+  risorse.forEach(id=>{const r=resources.find(x=>x.id===id);if(r){const d=document.createElement("div");d.className="lesson";d.textContent=r.titolo;d.onclick=()=>{openResource(resources.indexOf(r));document.querySelectorAll(".lesson").forEach(l=>l.classList.remove("active"));d.classList.add("active");updateProgress(i);};$("lessonList").appendChild(d);}});
+  updateProgress(i);
+  $("courseView").style.display="flex";
 }
+function updateProgress(i){const p=playlists[i];const risorse=Array.isArray(p.risorse)?p.risorse:JSON.parse(p.risorse||"[]");const done=$("lessonList").querySelectorAll(".lesson.active").length;$("courseProgress").innerText=`Progresso: ${done}/${risorse.length}`;}
 function closeCourseView(){$("courseView").style.display="none";}
-function updateContentHint(){
-  const type=$("resType").value;
-  $("contentHint").innerHTML= type==="video" ? "Inserisci l’URL di YouTube o Vimeo (es: https://www.youtube.com/embed/...)" :
-  type==="link" ? "Inserisci un link completo (es: https://...)" : "Inserisci testo o descrizione della risorsa.";
-}
+function updateContentHint(){const type=$("resType").value;let hint="";if(type==="video")hint="Suggerimento: incolla un link YouTube o Vimeo.";if(type==="testo")hint="Suggerimento: scrivi o incolla un testo.";if(type==="link")hint="Suggerimento: incolla un link web.";$("contentHint").textContent=hint;}
+
+// --- INIT ---
+$("searchInput").addEventListener("input",renderResources);
+$("categoryFilter").addEventListener("change",renderResources);
+$("gradeFilter").addEventListener("change",renderResources);
+loadResources();
+loadPlaylists();
+showSection("resources");
+function showSection(s){$("resourcesSection").style.display=s==="resources"?"block":"none";$("playlistsSection").style.display=s==="playlists"?"block":"none";$("navResources").classList.toggle("active",s==="resources");$("navPlaylists").classList.toggle("active",s==="playlists");}
 </script>
 </body>
 </html>
+
 
 
 
