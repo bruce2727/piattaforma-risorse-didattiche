@@ -2,8 +2,8 @@ name: Supabase keepalive
 
 on:
   schedule:
-    - cron: "*/30 * * * *"   # ogni 30 minuti
-  workflow_dispatch:          # permette "Run workflow" manuale
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
 
 jobs:
   ping:
@@ -12,10 +12,10 @@ jobs:
       - name: Ping Supabase
         run: |
           curl -sS \
-            -H "apikey: $SUPABASE_KEY" \
-            -H "Authorization: Bearer $SUPABASE_KEY" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
             "$SUPABASE_URL/rest/v1/risorse?select=*&limit=1" \
             | head -c 200
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
